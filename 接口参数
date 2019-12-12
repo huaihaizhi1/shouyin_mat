@@ -1,0 +1,19 @@
+class api_param(object):
+    #######接口参数验证##########
+    ######mastinfo是必填项#######
+    ######info是接口所有参数#####
+    # 所有参数json格式
+    # 基础模块：
+    # 用户管理
+    #     注册 /create_user
+    #         参数：telnumber,pwd,user_name
+    #     登录 /login_user
+    #         参数:telnumber,pwd
+    #     忘记密码 /forget_user
+    #         参数:telnumber,pwd
+    #注册/create_user
+    gobal create_user_info=dict(mast_info='telnumber,pwd,user_name',info='telnumber,pwd,user_name')
+    #登陆/login_user
+    login_user_info=dict(mast_info='telnumber,pwd',info='telnumber,pwd')
+    #忘记密码/forger_user
+    forger_user_info=dict(mast_info='telnumber,pwd',info='telnumber,pwd')
