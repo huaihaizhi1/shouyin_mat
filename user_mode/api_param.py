@@ -26,4 +26,5 @@ class api_param(object):
     select_shop_info = {'mast_info': 'id',
                         'info': 'id,shop_id,shop_name,shop_jc,province,city,country,street,address,logo'}
     #####员工信息######
-    staff_info={'mast_info': 'id','info':'shop_id,staff_id,staff_name'}
+    staff_info={'mast_info': 'id','info':'id,shop_id,staff_id,staff_name'}
+    classify={'mast_info':'id','info':'id,shop_id,'}

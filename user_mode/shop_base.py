@@ -69,7 +69,7 @@ def staff_user(request_body,path):
     id=request_body.get('id')
     staff_id=request_body.get('staff_id',None)
     staff_name=request_body.get('staff_name',None)
-    select_sql = 'select staff_id,staff_name from staff_user_table where shop_id="{0}" and status="{1}" '  .format(id,'0')
+    select_sql = 'select staff_id,staff_name from staff_user_table where shop_id="{0}" and status="{1}" '.format(id,'0')
     insert_sql = "insert into staff_user_table(shop_id,staff_id,staff_name,status,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','0','{3}','{4}')" \
         .format(id, staff_id, staff_name,date,date)
@@ -128,4 +128,35 @@ def staff_user(request_body,path):
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
 
+def classify(request_body,path):
+    #####获取form格式的请求体并解析
+    id=request_body.get('id')
+    s_id=request_body.get('s_id')
+    name=request_body.get('shop_name',None)
+    gradeid=request_body.get('shop_jc',None)
+    piarentid=request_body.get('province',None)
+    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if path=='create_classify_1':
+        insert_sql="insert into Catalog_table(name,gradeid,piarentid,status,create_time,update_time,shop_id) values" \
+                   "('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(name,'1','0','0'.date,date,id)
+        my_db(insert_sql)
+        res=dict(code=ResponseCode.SUCCESS,
+                       msg='父类添加成功',
+                       payload='null'
+                       )
+    if path=='update_classify_1':
+        update_sql="update Catalog_table set name='{0}' where shop_id='{1}' and id='{2}'".fromat(name,id,s_id)
+        my_db(update_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+               msg='父类添加成功',
+               payload='null'
+               )
+    if path=='delete_classify_1':
+        select_sql="SELECT"\
+                        "t1.id AS lv3_id,"\
+                    "FROM"\
+                        "Catalog_table AS t1"\
+                    "LEFT JOIN Catalog_table AS t2 ON t2.id = t1.piarentid"\
+                    "LEFT JOIN Catalog_table AS t3 ON t3.id = t2.piarentid where  shop_id='{0}' and id='{1}'".format(id,s_id)
+        print(my_db(select_sql))
 
