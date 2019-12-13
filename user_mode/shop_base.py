@@ -26,35 +26,39 @@ def shop(request_body,path):
                " where  shop_id='{9}'".format( shop_jc, shop_name, address, province, city, country, logo, date, street,id)
     if path=='/create_shop':
         if my_db(select_sql):
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户已创建'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户已创建',
+                       payload='null'
                        )
         else:
             my_db(insert_sql)
             res = dict(code=ResponseCode.SUCCESS,
-                       msg='操作成功'
+                       msg='操作成功',
+                       payload='null'
                        )
     if path=='/update_shop':
         if my_db(select_sql):
             my_db(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
-                       msg='修改成功'
+                       msg='修改成功',
+                       payload='null'
                        )
         else:
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户未开店'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户未开店',
+                       payload='null'
                        )
     if path=='/select_shop':
         if my_db(select_sql):
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
-                       payload=my_db(select_sql)
+                       payload=my_db(select_sql)[0]
                        )
         else:
             my_db(select_sql)
-            res = dict(code=ResponseCode.FAIL,
-                       msg='店铺不存在'
-                    )
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='店铺不存在',
+                        payload = 'null')
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
@@ -76,23 +80,27 @@ def staff_user(request_body,path):
     select_sql_staff_id = 'select * from staff_user_table where shop_id="{0}" and status="{1}"  and staff_id="{2}"'.format(id, '0',staff_id)
     if path=='/create_employess':
         if my_db(select_sql_staff_id):
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户已存在'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户已存在',
+                       payload='null'
                        )
         else:
             my_db(insert_sql)
             res = dict(code=ResponseCode.SUCCESS,
-                       msg='操作成功'
+                       msg='创建成功',
+                       payload='null'
                        )
     if path=='/update_employess':
         if my_db(select_sql_staff_id):
             my_db(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
-                       msg='修改成功'
+                       msg='修改成功',
+                       payload='null'
                        )
         else:
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户不存在'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户不存在',
+                       payload='null'
                        )
     if path=='/select_employess':
         if my_db(select_sql):
@@ -101,18 +109,20 @@ def staff_user(request_body,path):
                        payload=my_db(select_sql)
                        )
         else:
-            res = dict(code=ResponseCode.FAIL,
-                       msg='未添加店员'
-                    )
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='未添加店员',
+                       payload='null')
     if path=='/delete_employess':
         if my_db(select_sql_staff_id):
             my_db(delete_sql)
             res = dict(code=ResponseCode.SUCCESS,
-                       msg='操作成功'
+                       msg='操作成功',
+                       payload='null'
                        )
         else:
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户不存在'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户不存在',
+                       payload='null'
                     )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

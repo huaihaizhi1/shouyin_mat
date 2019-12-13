@@ -22,12 +22,14 @@ def login_user1(request_body):
             payload = dict(id=my_db(select_sql)[0]['id'],
                            telnumber=my_db(select_sql)[0]['telnumber'])
         else:
-                res=dict(code=ResponseCode.FAIL,
-                         msg='用户或者密码错误'
+                res=dict(code=ResponseCode.ACCOUNT_OR_PASS_WORD_ERR,
+                         msg=ResponseMessage.ACCOUNT_OR_PASS_WORD_ERR,
+                         payload='null'
                          )
     else:
-            res = dict(code=ResponseCode.FAIL,
-                       msg='用户不存在'
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户不存在',
+                       payload='null'
                        )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
@@ -42,14 +44,16 @@ def create_user1(request_body):
     select_sql = 'select telnumber from user_table where telnumber="%s" '%telnumber
     if my_db(select_sql):
         res=dict(code=ResponseCode.FAIL,
-                     msg='用户已存在'
+                     msg='用户已存在',
+                 payload='null'
                      )
     else:
         insert_sql="insert into user_table(telnumber,passwd,lastday_time,user_name,create_time,update_time) values ('{0}','{1}','{2}','{3}','{4}','{5}')"\
             .format(telnumber,pwd,date,user_name,date,date)
         my_db(insert_sql)
         res=dict(code=ResponseCode.SUCCESS,
-                     msg='用户注册成功'
+                     msg='用户注册成功',
+                 payload='null'
                      )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
@@ -64,10 +68,12 @@ def forget_user1(request_body):
     if my_db(select_sql):
         update_sql = "update user_table set passwd='{0}'  where telnumber ='{1}'".format (pwd,telnumber)
         res = dict(code=ResponseCode.SUCCESS,
-                   msg='密码修改成功')
+                   msg='密码修改成功',
+                   payload='null')
     else:
-        res = dict(code=ResponseCode.FAIL,
-                   msg='用户未注册'
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='用户未注册',
+                   payload='null'
                    )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
