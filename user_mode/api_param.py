@@ -27,4 +27,5 @@ class api_param(object):
                         'info': 'id,shop_id,shop_name,shop_jc,province,city,country,street,address,logo'}
     #####员工信息######
     staff_info={'mast_info': 'id','info':'id,shop_id,staff_id,staff_name'}
-    classify={'mast_info':'id','info':'id,shop_id,'}
+    ########商品分类信息#########
+    classify={'mast_info':'id','info':'id,shop_id'}

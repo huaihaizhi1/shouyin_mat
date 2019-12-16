@@ -6,7 +6,7 @@ import datetime
 import time
 
 
-def shop(request_body,path):
+def shop(request_body,path):                                ######店铺管理##########
     #####获取form格式的请求体并解析
     id=request_body.get('id')
     shop_name=request_body.get('shop_name',None)
@@ -25,20 +25,20 @@ def shop(request_body,path):
     update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}',street='{8}'" \
                " where  shop_id='{9}'".format( shop_jc, shop_name, address, province, city, country, logo, date, street,id)
     if path=='/create_shop':
-        if my_db(select_sql):
+        if my_db(select_sql):                           #查看店铺是否存在
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已创建',
                        payload='null'
                        )
         else:
-            my_db(insert_sql)
+            my_db(insert_sql)                           #店铺创建
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload='null'
                        )
     if path=='/update_shop':
-        if my_db(select_sql):
-            my_db(update_sql)
+        if my_db(select_sql):                       #查看店铺是否存在
+            my_db(update_sql)                       #修改店铺信息
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
                        payload='null'
@@ -49,7 +49,7 @@ def shop(request_body,path):
                        payload='null'
                        )
     if path=='/select_shop':
-        if my_db(select_sql):
+        if my_db(select_sql):                       #查看店铺是否存在并返回店铺数据
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload=my_db(select_sql)[0]
@@ -63,7 +63,7 @@ def shop(request_body,path):
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
 
-def staff_user(request_body,path):
+def staff_user(request_body,path):                  #####导购员管理########
     #####获取form格式的请求体并解析
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     id=request_body.get('id')
@@ -78,7 +78,7 @@ def staff_user(request_body,path):
     delete_sql="update staff_user_table set status='{0}'" \
                " where  shop_id='{1}' and staff_id='{2}'".format('1', id, staff_id)
     select_sql_staff_id = 'select * from staff_user_table where shop_id="{0}" and status="{1}"  and staff_id="{2}"'.format(id, '0',staff_id)
-    if path=='/create_employess':
+    if path=='/create_employess':               #创建店员####
         if my_db(select_sql_staff_id):
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已存在',
@@ -128,10 +128,11 @@ def staff_user(request_body,path):
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
 
-def catalog(request_body,path):
+def catalog(request_body,path):                         #######商品分类管理##########
     id=request_body.get('id')
     name=request_body.get('name')
     s_id=request_body.get('s_id')
+    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if path=='/select_catalog':
         select_sql="select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and gradeid=1 ".format(id)
         if my_db(select_sql):
@@ -162,7 +163,7 @@ def catalog(request_body,path):
         s_id=s_id.split('_')
         select_sql="select id from Catalog_table where shop_id='{0}' and id='{1}'".format(id,s_id[0])
         if my_db(select_sql):
-            update_sql="update Catalog_table set name='{0}' where shop_id='{0}' and id='{1}' ".format(name,id,s_id[0])
+            update_sql="update Catalog_table set name='{0}' where shop_id='{1}' and id='{2}' ".format(name,id,s_id[0])
             my_db(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
                msg='修改成功',
@@ -175,16 +176,45 @@ def catalog(request_body,path):
                )
     elif path=='/del_catalog':
         s_id=s_id.split('_')
-        del_3="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
-        del_2="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
-        del_1="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
-    # if path=='delete_classify_1':
-    #     select_sql="SELECT"\
-    #                     "t1.id AS lv3_id,"\
-    #                 "FROM"\
-    #                     "Catalog_table AS t1"\
-    #                 "LEFT JOIN Catalog_table AS t2 ON t2.id = t1.piarentid"\
-    #                 "LEFT JOIN Catalog_table AS t3 ON t3.id = t2.piarentid where  shop_id='{0}' and id='{1}'".format(id,s_id)
-    #     print(my_db(select_sql))
+        select_sql="select id from Catalog_table where gradeid='{0}' and id='{1}' and shop_id='{2}'"\
+                        "union ALL "\
+                        "select id from Catalog_table where  piarentid in (select id from Catalog_table "\
+                        "where gradeid='{0}' and id='{1}' and shop_id='{2}'"\
+                        ")"\
+                        "union all "\
+                        "select id from  Catalog_table where  piarentid   in "\
+                        "(select id from Catalog_table where  piarentid in "\
+                        "(select id from Catalog_table "\
+                        "where gradeid='{0}' and id='{1}' and shop_id='{2}'"\
+                        "))".format(s_id[1],s_id[0],id)
+        st2=''
+        for i in range(0,len(my_db(select_sql))):
+            if i==len(my_db(select_sql))-1:
+                st2=st2+str(my_db(select_sql)[i]['id'])
+            else:
+                st2=st2+str(my_db(select_sql)[i]['id'])+','
+        del_sql="delete from Catalog_table where id in ({0}) and shop_id='{1}'".format(st2,id)
+        my_db(del_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='删除成功',
+                   payload='null'
+                   )
+    elif path=='/create_catalog':
+        if s_id=='999':
+            insert_sql="insert into Catalog_table(shop_id,name,gradeid,piarentid,status,create_time,update_time) " \
+                   "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(id,name,'1','0','0',date,date)
+        else:
+            s_id = s_id.split('_')
+            gradeid=int(s_id[1])+1
+            piarentid=s_id[0]
+            insert_sql="insert into Catalog_table(shop_id,name,gradeid,piarentid,status,create_time,update_time) " \
+                   "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(id,name,gradeid,piarentid,'0',date,date)
+        my_db(insert_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='创建成功',
+                   payload='null'
+                   )
+    resp = make_response(res)
+    resp.headers['Content-Type'] = 'text/json'
     return res
 
