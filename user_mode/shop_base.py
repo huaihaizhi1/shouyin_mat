@@ -128,35 +128,63 @@ def staff_user(request_body,path):
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
 
-def classify(request_body,path):
-    #####获取form格式的请求体并解析
+def catalog(request_body,path):
     id=request_body.get('id')
+    name=request_body.get('name')
     s_id=request_body.get('s_id')
-    name=request_body.get('shop_name',None)
-    gradeid=request_body.get('shop_jc',None)
-    piarentid=request_body.get('province',None)
-    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    if path=='create_classify_1':
-        insert_sql="insert into Catalog_table(name,gradeid,piarentid,status,create_time,update_time,shop_id) values" \
-                   "('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(name,'1','0','0'.date,date,id)
-        my_db(insert_sql)
-        res=dict(code=ResponseCode.SUCCESS,
-                       msg='父类添加成功',
+    if path=='/select_catalog':
+        select_sql="select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and gradeid=1 ".format(id)
+        if my_db(select_sql):
+            tmp_list2=[]
+            for st1 in my_db(select_sql):
+                #print(st1)
+                select_sql = "select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and piarentid='{1}' ".format(id,st1['id'])
+                #print(my_db(select_sql))
+                tmp_list1=[]
+                for st2 in my_db(select_sql):
+                    select_sql = "select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and piarentid='{1}' ".format(id,st2['id'])
+                    data=(my_db(select_sql))
+                    st2['data']=data
+                    tmp_list1.append(st2)
+                st1['data'] = tmp_list1
+                tmp_list2.append(st1)
+            print(tmp_list2)
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='查询成功',
+                       payload=tmp_list2
+                    )
+        else:
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='用户未分类',
                        payload='null'
-                       )
-    if path=='update_classify_1':
-        update_sql="update Catalog_table set name='{0}' where shop_id='{1}' and id='{2}'".fromat(name,id,s_id)
-        my_db(update_sql)
-        res = dict(code=ResponseCode.SUCCESS,
-               msg='父类添加成功',
+                    )
+    elif path=='/update_catalog':
+        s_id=s_id.split('_')
+        select_sql="select id from Catalog_table where shop_id='{0}' and id='{1}'".format(id,s_id[0])
+        if my_db(select_sql):
+            update_sql="update Catalog_table set name='{0}' where shop_id='{0}' and id='{1}' ".format(name,id,s_id[0])
+            my_db(update_sql)
+            res = dict(code=ResponseCode.SUCCESS,
+               msg='修改成功',
                payload='null'
                )
-    if path=='delete_classify_1':
-        select_sql="SELECT"\
-                        "t1.id AS lv3_id,"\
-                    "FROM"\
-                        "Catalog_table AS t1"\
-                    "LEFT JOIN Catalog_table AS t2 ON t2.id = t1.piarentid"\
-                    "LEFT JOIN Catalog_table AS t3 ON t3.id = t2.piarentid where  shop_id='{0}' and id='{1}'".format(id,s_id)
-        print(my_db(select_sql))
+        else:
+            res = dict(code=ResponseCode.SUCCESS,
+               msg='id不存在',
+               payload='null'
+               )
+    elif path=='/del_catalog':
+        s_id=s_id.split('_')
+        del_3="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
+        del_2="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
+        del_1="delete from Catalog_table where id='{0}'and shop_id='{1}'".format(s_id[0],id)
+    # if path=='delete_classify_1':
+    #     select_sql="SELECT"\
+    #                     "t1.id AS lv3_id,"\
+    #                 "FROM"\
+    #                     "Catalog_table AS t1"\
+    #                 "LEFT JOIN Catalog_table AS t2 ON t2.id = t1.piarentid"\
+    #                 "LEFT JOIN Catalog_table AS t3 ON t3.id = t2.piarentid where  shop_id='{0}' and id='{1}'".format(id,s_id)
+    #     print(my_db(select_sql))
+    return res
 
