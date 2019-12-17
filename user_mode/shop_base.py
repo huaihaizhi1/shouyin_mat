@@ -145,9 +145,9 @@ def catalog(request_body,path):                         #######商品分类管�
                 for st2 in my_db(select_sql):
                     select_sql = "select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and piarentid='{1}' ".format(id,st2['id'])
                     data=(my_db(select_sql))
-                    st2['data']=data
+                    st2['children']=data
                     tmp_list1.append(st2)
-                st1['data'] = tmp_list1
+                st1['children'] = tmp_list1
                 tmp_list2.append(st1)
             print(tmp_list2)
             res = dict(code=ResponseCode.SUCCESS,
@@ -200,7 +200,7 @@ def catalog(request_body,path):                         #######商品分类管�
                    payload='null'
                    )
     elif path=='/create_catalog':
-        if s_id=='999':
+        if s_id=='-1':
             insert_sql="insert into Catalog_table(shop_id,name,gradeid,piarentid,status,create_time,update_time) " \
                    "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(id,name,'1','0','0',date,date)
         else:
