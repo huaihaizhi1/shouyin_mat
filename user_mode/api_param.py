@@ -29,3 +29,5 @@ class api_param(object):
     staff_info={'mast_info': 'id','info':'id,shop_id,staff_id,staff_name'}
     ########商品分类信息#########
     classify={'mast_info':'id','info':'id,shop_id'}
+    ###采购管理###########
+    purchase_goods={'mast_info':'id','info':'id,shop_id'}
