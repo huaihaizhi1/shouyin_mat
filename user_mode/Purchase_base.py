@@ -30,11 +30,18 @@ def purchase_goods(request_body,path):
             print(i, request_body.get(i))
             if i in list1:
                 list2.append(i)
-        print(list2)
         tmp_sql1=''
         for i  in range(0,len(list2)):
             tmp_sql=" and {0}='{1}' ".format(list2[i], request_body.get(list2[i]))
             tmp_sql1=tmp_sql1+tmp_sql
-        print(tmp_sql1)
         select_sql=select_sql+tmp_sql1
         print(select_sql)
+        my_db(select_sql)                         #查看货单数据####
+        res = dict(code=ResponseCode.SUCCESS,
+                       msg='查询成功',
+                       payload=my_db(select_sql)
+                       )
+
+    resp = make_response(res)
+    resp.headers['Content-Type'] = 'text/json'
+    return jsonify(res)

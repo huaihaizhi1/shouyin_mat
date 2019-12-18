@@ -216,5 +216,5 @@ def catalog(request_body,path):                         #######商品分类管�
                    )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
-    return res
+    return jsonify(res)
 
