@@ -41,6 +41,32 @@ def purchase_goods(request_body,path):
                        msg='查询成功',
                        payload=my_db(select_sql)
                        )
+    if path=='/create_purchase':
+        id=request_body.get('id')
+        select_sql="select max(code_id) as code_id from t_purchase_table where shop_id='{0}'".format(id)
+        if my_db(select_sql)[0]['code_id']=='None':
+            print(my_db(select_sql))
+            code1=int(my_db(select_sql)[0]['code_id'].split('_')[1])
+            code_id=id+'_'+str(code1+1)
+        else:
+            code_id=id+'_10001'
+        list1=['purchase_no','purchase_date','suppiler_no','suppiler_name','purchas_price','user_id','user_name','remarks','price_status']
+        list2=[]
+        for i in request_body:
+            print(i, request_body.get(i))
+            if i in list1:
+                if request_body.get(i)=='':
+                    break
+                list2.append(i)
+        print(list2)
+        tmp_sql=''
+        if len(list2)!=0:
+            for i  in range(0,len(list2)):
+                tmp1_sql=list2[i]
+                tmp_sql=tmp1_sql+tmp_sql
+            insert_sql="insert into t_purchase_table(shop_id,code_id,status,{0}) values('{1}','{2}','0',{3}) ".format(tmp_sql,id,code_id,tmp_sql)
+
+        print(insert_sql)
 
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

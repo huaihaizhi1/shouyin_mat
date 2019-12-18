@@ -233,8 +233,8 @@ def select_purchase():
         res = res1  # 接口返回不为200则提示错误系信息
     return res
 
-@server.route('/select_purchase',methods=["POST","GET"])           ####删除创建分类信息########
-def select_purchase():
+@server.route('/create_purchase',methods=["POST","GET"])           ####删除创建分类信息########
+def create_purchase():
     dict1 = api_param.purchase_goods  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
