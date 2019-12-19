@@ -69,6 +69,8 @@ def staff_user(request_body,path):                  #####导购员管理########
     id=request_body.get('id')
     staff_id=request_body.get('staff_id',None)
     staff_name=request_body.get('staff_name',None)
+    pageNo=request_body.get('pageNo')
+    pagesize=request_body.get('pagesize')
     select_sql = 'select staff_id,staff_name from staff_user_table where shop_id="{0}" and status="{1}" '.format(id,'0')
     insert_sql = "insert into staff_user_table(shop_id,staff_id,staff_name,status,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','0','{3}','{4}')" \
@@ -104,8 +106,17 @@ def staff_user(request_body,path):                  #####导购员管理########
                        )
     if path=='/select_employess':
         if my_db(select_sql):
+            start = int(int(pageNo) - 1) * int(pagesize)
+            stop = pagesize
+            limit1 = " order by id desc limit {0}, {1}".format(start, stop)
+            select_sql = select_sql + limit1
+            print(select_sql)
+            total_sql = "select count(id) as total from staff_user_table where shop_id='{0}' and status=0".format(id)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
+                       total=my_db(total_sql)[0]['total'],
+                       page=start,
+                       pagesize=stop,
                        payload=my_db(select_sql)
                        )
         else:

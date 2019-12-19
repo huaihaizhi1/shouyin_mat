@@ -9,7 +9,7 @@ def login_user1(request_body):
     telnumber=request_body.get('telnumber')
     pwd=my_md5(request_body.get('pwd'))
     payload={}
-    select_sql='select telnumber,passwd,id from user_table where telnumber="%s"'%telnumber
+    select_sql='select telnumber,passwd,id,user_name from user_table where telnumber="%s"'%telnumber
     if my_db(select_sql):
         #print(list(my_db(select_sql))[0][0])
         #sessions['username']=list(my_db(select_sql))[0][0]
@@ -20,6 +20,7 @@ def login_user1(request_body):
                                      telnumber=my_db(select_sql)[0]['telnumber'])
                          )
             payload = dict(id=my_db(select_sql)[0]['id'],
+                           user_name=my_db(select_sql)[0]['user_name'],
                            telnumber=my_db(select_sql)[0]['telnumber'])
         else:
                 res=dict(code=ResponseCode.ACCOUNT_OR_PASS_WORD_ERR,

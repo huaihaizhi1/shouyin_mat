@@ -23,7 +23,7 @@ server.config['SECRET_KEY'] = os.urandom(24)
 #     return None
 @server.route("/login_user",methods=["POST","GET"])                  #用户登陆
 def login_user():                                                       #注意接口名称与上面相同
-    dict1=api_param.login_user_info                                     #获取接口参数必填项与参数列表(需要修改)
+    dict1=api_param.login_user1                                     #获取接口参数必填项与参数列表(需要修改)
     request_body=request.form                                           #获取接口表单参数
     res1=Required_verification(request_body,dict1)
     if res1['code']==200:         #必填项检查是否为200
@@ -36,7 +36,7 @@ def login_user():                                                       #注意�
 
 @server.route("/create_user",methods=["POST","GET"])                #用户注册
 def create_user():
-    dict1=api_param.create_user_info                                     #获取接口参数必填项与参数列表
+    dict1=api_param.create_user1                                     #获取接口参数必填项与参数列表
     request_body=request.form                                           #获取接口表单参数
     Required_verification(request_body,dict1)                           #接口必填项验证
     scode=session.get("code")
@@ -51,7 +51,7 @@ def create_user():
 
 @server.route("/forget_user",methods=["POST","GET"])                #忘记密码
 def forget_user():
-    dict1=api_param.forger_user_info                                     #获取接口参数必填项与参数列表
+    dict1=api_param.forget_user1                                     #获取接口参数必填项与参数列表
     request_body=request.form                                           #获取接口表单参数
     if Required_verification(request_body,dict1)['code']==200:         #必填项检查是否为200
         res=forget_user1(request_body)                                  #必填项为200则进入接口执行阶段并返回结果
@@ -95,7 +95,7 @@ def login_check():
     return res
 @server.route('/create_shop',methods=["POST","GET"])           ####创建开店信息########
 def create_shop():
-    dict1 = api_param.select_shop_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.create_shop  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -117,7 +117,7 @@ def select_shop():
     return res
 @server.route('/update_shop',methods=["POST","GET"])           ####修改开店信息########
 def update_shop():
-    dict1 = api_param.select_shop_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.update_shop  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -129,7 +129,7 @@ def update_shop():
 
 @server.route('/create_employess',methods=["POST","GET"])           ####新增店员########
 def create_employess():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.create_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -140,7 +140,7 @@ def create_employess():
     return res
 @server.route('/update_employess',methods=["POST","GET"])           ####修改店员信息########
 def update_employess():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.update_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -162,7 +162,7 @@ def select_employess():
     return res
 @server.route('/delete_employess',methods=["POST","GET"])           ####删除店员信息########
 def delete_employess():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.delete_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -175,7 +175,7 @@ def delete_employess():
 
 @server.route('/select_catalog',methods=["POST","GET"])           ####查看分类信息########
 def select_catalog():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.select_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -184,9 +184,9 @@ def select_catalog():
     else:
         res = res1  # 接口返回不为200则提示错误系信息
     return res
-@server.route('/update_catalog',methods=["POST","GET"])           ####删修改分类信息信息########
+@server.route('/update_catalog',methods=["POST","GET"])           ####修改分类信息信息########
 def update_catalog():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.update_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -198,7 +198,7 @@ def update_catalog():
 
 @server.route('/del_catalog',methods=["POST","GET"])           ####删除分类信息########
 def del_catalog():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.del_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
@@ -210,7 +210,7 @@ def del_catalog():
 
 @server.route('/create_catalog',methods=["POST","GET"])           ####删除创建分类信息########
 def create_catalog():
-    dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.create_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
