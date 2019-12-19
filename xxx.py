@@ -1,10 +1,11 @@
 from flask import Flask, sessions, request, make_response, jsonify
 import os
-from db import my_md5, my_db
+from db import my_md5, PymysqlPool
 from code1 import ResponseCode, ResponseMessage
 import datetime
 import time
 server=Flask(__name__)
+
 @server.route('/select_shop', methods=["GET","POST"])           ####登录检查########
 def select_shop():
     #####获取form格式的请求体并解析
@@ -19,7 +20,12 @@ def select_shop():
             dict[aa[i]]=request_body.get(aa[i])
 
     return None
-
+    telnumber=request_body.get('telnumber')
+    pwd=my_md5(request_body.get('pwd'))
+    payload={}
+    select_sql='select telnumber,passwd,id,user_name from user_table where telnumber="%s"'%telnumber
+    mysql=PymysqlPool()
+    resluts=mysql.getAll(select_sql)
 
 if __name__ == "__main__":
     server.run(port=9999, debug=True, host='0.0.0.0')
