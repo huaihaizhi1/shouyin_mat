@@ -208,7 +208,7 @@ def del_catalog():
         res = res1  # 接口返回不为200则提示错误系信息
     return res
 
-@server.route('/create_catalog',methods=["POST","GET"])           ####删除创建分类信息########
+@server.route('/create_catalog',methods=["POST","GET"])           ####创建分类信息########
 def create_catalog():
     dict1 = api_param.create_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
@@ -221,9 +221,9 @@ def create_catalog():
     return res
 
 
-@server.route('/select_purchase',methods=["POST","GET"])           ####删除创建分类信息########
+@server.route('/select_purchase',methods=["POST","GET"])           ####查看货单列表########
 def select_purchase():
-    dict1 = api_param.purchase_goods  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.select_purchase  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)

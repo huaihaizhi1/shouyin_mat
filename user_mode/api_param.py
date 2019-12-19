@@ -45,6 +45,5 @@ class api_param(object):
     del_catalog={'mast_info':'id,s_id','info':'id,shop_id'}
     #######商品分类查看####
     create_catalog={'mast_info':'id,name,s_id','info':'id,shop_id'}
-    ###采购管理###########
-    purchase_goods={'mast_info':'id','info':'id,shop_id'}
-    purchase_goods={'mast_info':'id','info':'id,shop_id'}
+    ###货单主页查询###########
+    select_purchase={'mast_info':'id,pageNo,pagesize,status','info':'id,shop_id'}
