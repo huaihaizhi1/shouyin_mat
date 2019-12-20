@@ -12,7 +12,7 @@ def login_user1(request_body):
     select_sql='select telnumber,passwd,id,user_name from user_table where telnumber="%s"'%telnumber
     mysql=PymysqlPool()
     resluts=mysql.getAll(select_sql)
-    if resluts:
+    if resluts!=[]:
         #print(list(my_db(select_sql))[0][0])
         #sessions['username']=list(my_db(select_sql))[0][0]
         if pwd==resluts[0]['passwd'] and telnumber==resluts[0]['telnumber']:
@@ -48,7 +48,7 @@ def create_user1(request_body):
     select_sql = 'select telnumber from user_table where telnumber="%s" '%telnumber
     mysql=PymysqlPool()
     resluts=mysql.getAll(select_sql)
-    if resluts:
+    if resluts!=[]:
         res=dict(code=ResponseCode.FAIL,
                      msg='用户已存在',
                  payload='null'
@@ -74,7 +74,7 @@ def forget_user1(request_body):
     select_sql = 'select telnumber from user_table where telnumber="%s" ' % telnumber
     mysql=PymysqlPool()
     resluts=mysql.getAll(select_sql)
-    if resluts:
+    if resluts!=[]:
         update_sql = "update user_table set passwd='{0}'  where telnumber ='{1}'".format (pwd,telnumber)
         mysql.update(update_sql)
         res = dict(code=ResponseCode.SUCCESS,

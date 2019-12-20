@@ -63,7 +63,7 @@ class PymysqlPool(BasePymysqlPool):
         if count > 0:
             result = self._cursor.fetchall()
         else:
-            result = False
+            result = []
         return result
 
     def getOne(self, sql, param=None):
@@ -80,7 +80,7 @@ class PymysqlPool(BasePymysqlPool):
         if count > 0:
             result = self._cursor.fetchone()
         else:
-            result = False
+            result = []
         return result
 
     def getMany(self, sql, num, param=None):
@@ -98,7 +98,7 @@ class PymysqlPool(BasePymysqlPool):
         if count > 0:
             result = self._cursor.fetchmany(num)
         else:
-            result = False
+            result = []
         return result
 
     def insertMany(self, sql, values):

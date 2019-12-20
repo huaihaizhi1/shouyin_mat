@@ -27,7 +27,7 @@ def shop(request_body,path):                                ######店铺管理##
     if path=='/create_shop':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
-        if resluts:                           #查看店铺是否存在
+        if resluts!=[]:                           #查看店铺是否存在
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已创建',
                        payload='null'
@@ -42,7 +42,7 @@ def shop(request_body,path):                                ######店铺管理##
     if path=='/update_shop':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
-        if resluts:                       #查看店铺是否存在
+        if resluts!=[]:                       #查看店铺是否存在
             mysql.update(update_sql)                       #修改店铺信息
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
@@ -57,7 +57,7 @@ def shop(request_body,path):                                ######店铺管理##
     if path=='/select_shop':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
-        if resluts:                       #查看店铺是否存在并返回店铺数据
+        if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload=resluts[0]
@@ -91,7 +91,7 @@ def staff_user(request_body,path):                  #####导购员管理########
     if path=='/create_employess':               #创建店员####
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
-        if resluts:
+        if resluts!=[]:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已存在',
                        payload='null'
@@ -106,7 +106,7 @@ def staff_user(request_body,path):                  #####导购员管理########
     if path=='/update_employess':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
-        if resluts:
+        if resluts!=[]:
             mysql.update(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
@@ -121,7 +121,7 @@ def staff_user(request_body,path):                  #####导购员管理########
     if path=='/select_employess':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
-        if resluts:
+        if resluts!=[]:
             start = int(int(pageNo) - 1) * int(pagesize)
             stop = pagesize
             limit1 = " order by id desc limit {0}, {1}".format(start, stop)
@@ -143,7 +143,7 @@ def staff_user(request_body,path):                  #####导购员管理########
     if path=='/delete_employess':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
-        if resluts:
+        if resluts!=[]:
             mysql.update(delete_sql)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
@@ -168,7 +168,9 @@ def catalog(request_body,path):                         #######商品分类管�
         select_sql="select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and gradeid=1 ".format(id)
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
-        if resluts:
+        print(resluts)
+        if resluts!=[]:
+            print(resluts)
             tmp_list2=[]
             for st1 in mysql.getAll(select_sql):
                 #print(st1)
@@ -178,6 +180,7 @@ def catalog(request_body,path):                         #######商品分类管�
                 for st2 in mysql.getAll(select_sql):
                     select_sql = "select id,CONCAT(id,CONCAT('_'),gradeid)  s_id,name from Catalog_table where shop_id='{0}' and piarentid='{1}' ".format(id,st2['id'])
                     data=(mysql.getAll(select_sql))
+
                     st2['children']=data
                     tmp_list1.append(st2)
                 st1['children'] = tmp_list1
@@ -197,7 +200,7 @@ def catalog(request_body,path):                         #######商品分类管�
         s_id=s_id.split('_')
         select_sql="select id from Catalog_table where shop_id='{0}' and id='{1}'".format(id,s_id[0])
         mysql = PymysqlPool()
-        if mysql.getAll(select_sql):
+        if mysql.getAll(select_sql)!=[]:
             update_sql="update Catalog_table set name='{0}' where shop_id='{1}' and id='{2}' ".format(name,id,s_id[0])
             mysql.update(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
