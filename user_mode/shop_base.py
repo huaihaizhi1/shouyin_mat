@@ -30,13 +30,13 @@ def shop(request_body,path):                                ######店铺管理##
         if resluts!=[]:                           #查看店铺是否存在
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已创建',
-                       payload='null'
+                       payload=None
                        )
         else:
             mysql.insert(insert_sql)                           #店铺创建
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
-                       payload='null'
+                       payload=None
                        )
             mysql.dispose()
     if path=='/update_shop':
@@ -46,13 +46,13 @@ def shop(request_body,path):                                ######店铺管理##
             mysql.update(update_sql)                       #修改店铺信息
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
-                       payload='null'
+                       payload=None
                        )
             mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户未开店',
-                       payload='null'
+                       payload=None
                        )
     if path=='/select_shop':
         mysql = PymysqlPool()
@@ -66,7 +66,7 @@ def shop(request_body,path):                                ######店铺管理##
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='店铺不存在',
-                        payload = 'null')
+                        payload = None)
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
@@ -94,13 +94,13 @@ def staff_user(request_body,path):                  #####导购员管理########
         if resluts!=[]:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已存在',
-                       payload='null'
+                       payload=None
                        )
         else:
             mysql.insert(insert_sql)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='创建成功',
-                       payload='null'
+                       payload=None
                        )
             mysql.dispose()
     if path=='/update_employess':
@@ -110,13 +110,13 @@ def staff_user(request_body,path):                  #####导购员管理########
             mysql.update(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
-                       payload='null'
+                       payload=None
                        )
             mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户不存在',
-                       payload='null'
+                       payload=None
                        )
     if path=='/select_employess':
         mysql = PymysqlPool()
@@ -139,7 +139,7 @@ def staff_user(request_body,path):                  #####导购员管理########
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='未添加店员',
-                       payload='null')
+                       payload=None)
     if path=='/delete_employess':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
@@ -147,13 +147,13 @@ def staff_user(request_body,path):                  #####导购员管理########
             mysql.update(delete_sql)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
-                       payload='null'
+                       payload=None
                        )
             mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户不存在',
-                       payload='null'
+                       payload=None
                     )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
@@ -193,7 +193,7 @@ def catalog(request_body,path):                         #######商品分类管�
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户未分类',
-                       payload='null'
+                       payload=None
                     )
         mysql.dispose()
     elif path=='/update_catalog':
@@ -205,12 +205,12 @@ def catalog(request_body,path):                         #######商品分类管�
             mysql.update(update_sql)
             res = dict(code=ResponseCode.SUCCESS,
                msg='修改成功',
-               payload='null'
+               payload=None
                )
         else:
             res = dict(code=ResponseCode.SUCCESS,
                msg='id不存在',
-               payload='null'
+               payload=None
                )
         mysql.dispose()
     elif path=='/del_catalog':
@@ -237,7 +237,7 @@ def catalog(request_body,path):                         #######商品分类管�
         mysql.delete(del_sql)
         res = dict(code=ResponseCode.SUCCESS,
                    msg='删除成功',
-                   payload='null'
+                   payload=None
                    )
         mysql.dispose()
     elif path=='/create_catalog':
@@ -254,7 +254,7 @@ def catalog(request_body,path):                         #######商品分类管�
         mysql.insert(insert_sql)
         res = dict(code=ResponseCode.SUCCESS,
                    msg='创建成功',
-                   payload='null'
+                   payload=None
                    )
         mysql.dispose()
     resp = make_response(res)

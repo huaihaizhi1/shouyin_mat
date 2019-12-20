@@ -28,12 +28,12 @@ def login_user1(request_body):
         else:
                 res=dict(code=ResponseCode.ACCOUNT_OR_PASS_WORD_ERR,
                          msg=ResponseMessage.ACCOUNT_OR_PASS_WORD_ERR,
-                         payload='null'
+                         payload=None
                          )
     else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户不存在',
-                       payload='null'
+                       payload=None
                        )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
@@ -51,7 +51,7 @@ def create_user1(request_body):
     if resluts!=[]:
         res=dict(code=ResponseCode.FAIL,
                      msg='用户已存在',
-                 payload='null'
+                 payload=None
                      )
     else:
         insert_sql="insert into user_table(telnumber,passwd,lastday_time,user_name,create_time,update_time) values ('{0}','{1}','{2}','{3}','{4}','{5}')"\
@@ -59,7 +59,7 @@ def create_user1(request_body):
         mysql.insert(insert_sql)
         res=dict(code=ResponseCode.SUCCESS,
                      msg='用户注册成功',
-                 payload='null'
+                 payload=None
                      )
         mysql.dispose()
     resp = make_response(res)
@@ -84,7 +84,7 @@ def forget_user1(request_body):
     else:
         res = dict(code=ResponseCode.SUCCESS,
                    msg='用户未注册',
-                   payload='null'
+                   payload=None
                    )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
