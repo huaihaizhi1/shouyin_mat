@@ -261,3 +261,33 @@ def catalog(request_body,path):                         #######商品分类管�
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
 
+def total_address(request_body,path):               #######省份地市信息
+    mysql = PymysqlPool()
+    if path=='/province':
+        select_sql='select code as provincecode,name from province'
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='省份查询',
+                   payload=mysql.getAll(select_sql)
+                   )
+    if path=='/city':
+        provincecode=request_body.get('provincecode')
+        select_sql='select code as citycode,name from city where provincecode={0}' .format(provincecode)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='城市查询',
+                   payload=mysql.getAll(select_sql)
+                   )
+    if path=='/area':
+        citycode=request_body.get('citycode')
+        print(citycode)
+        select_sql='select code,name from area where citycode={0}' .format(citycode)
+        print(select_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='地区查询',
+                   payload=mysql.getAll(select_sql)
+                   )
+    mysql.dispose()
+    resp = make_response(res)
+    resp.headers['Content-Type'] = 'text/json'
+    return res
+
+

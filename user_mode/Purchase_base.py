@@ -4,21 +4,36 @@ import os
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
-import time
+from user_mode.public import *
 
 
 
 def purchase_goods(request_body,path):
     id=request_body.get('id')
-    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    pageNo=request_body.get('pageNo')
-    pagesize=request_body.get('pagesize')
-    status=request_body.get('status')
-    print(request_body)
+    #date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if path=='/select_purchase':
+        pageNo = request_body.get('pageNo')
+        pagesize = request_body.get('pagesize')
+        if request_body.get('start_data')=='':
+            start_data=get_date(7,1)
+        else:
+            start_data = request_body.get('start_data')
+        if request_body.get('end_data')=='':
+            end_data=get_date(0,1)
+        else:
+            end_data = request_body.get('end_data')
+        if request_body.get('start_price')=='':
+            start_price='0'
+        else:
+            start_price = request_body.get('start_price')
+        if request_body.get('end_price')=='':
+            end_price='99999999999'
+        else:
+            end_price = request_body.get('end_price')
         mysql = PymysqlPool()
-        list1=['code_id','start_data','end_data','suppiler_name','price_status','start_price','end_price','purchase_no','user_name']
-        select_sql="select code_id,purchase_no,purchase_date,suppiler_name,purchas_price,price_status,user_name from t_purchase_table where shop_id='{0}'".format(id)
+        list1=['code_id','suppiler_name','price_status','purchase_no','user_name']
+        select_sql="select code_id,purchase_no,purchase_date,suppiler_name,purchas_price,price_status,user_name from t_purchase_table where shop_id='{0}'" \
+                   " and purchase_date>={1} and purchase_date<={2} and purchas_price>={3} and purchas_price<={4} ".format(id,start_data,end_data,start_price,end_price)
         list2=[]
         for i in request_body:
             if i in list1:
@@ -44,6 +59,8 @@ def purchase_goods(request_body,path):
                    pagesize=stop,
                        payload=mysql.getAll(select_sql)
                        )
+    if path=='/create_purchase':
+        1
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)

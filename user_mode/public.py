@@ -1,5 +1,6 @@
 from code1 import *
-
+from datetime import datetime, date
+from datetime import timedelta
 ##############################必填项检查#########################
 def Required_verification(request_body,dict1):       ###必填项检查
     if request_body:                                    #判断接口是否有参数
@@ -105,3 +106,14 @@ def test_verify_captcha(request_body,scode):
     return {"code":200,
          "msg":'验证成功',
          "payload":{}}
+
+
+def get_date(days,n):
+    # 格式化为 年月日 形式 2019-02-25
+    if n==1:
+        data=(date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+    else:
+
+    # 格式化为 年月日时分秒 形式 2019-02-25 10:56:58.609985
+        data=datetime.now() - timedelta(days=days)
+    return data
