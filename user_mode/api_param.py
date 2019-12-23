@@ -47,3 +47,13 @@ class api_param(object):
     create_catalog={'mast_info':'id,name,s_id','info':'id,shop_id'}
     ###货单主页查询###########
     select_purchase={'mast_info':'id,pageNo,pagesize,status','info':'id,shop_id'}
+    ######货单新增###########
+    create_purchase={'mast_info':'id,purchase_date,purchas_price,user_id,user_name,price_status,payload,remarks'}
+    ##########供应商查看####
+    select_supplier={'mast_info':'id,pageNo,pagesize'}
+    #######供应商修改#######
+    update_supplier={'mast_info':'id,name,number,address,contact,proc_id,remarks'}
+    ######供应商删除########
+    delete_supplier={'mast_info':'id,proc_id'}
+    ######供应商添加########
+    insert_supplier={'mast_info':'id,name,number,address,contact,remarks'}

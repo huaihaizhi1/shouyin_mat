@@ -9,7 +9,7 @@ def Required_verification(request_body,dict1):       ###必填项检查
         m=0                                             #用于判断必填项是否都填了
         str=''                                          #用于错误信息提示
         for i in range(0,len(aa)):                      #循环判断必填项检查
-            if request_body.get(aa[i]):                 #检查必填字段
+            if request_body.get(aa[i]) or request_body.get(aa[i])=='':                 #检查必填字段
                 m=m+1                                    #用于验证必填
             else:
                 str=str+aa[i]+','                       #错误信息提示
