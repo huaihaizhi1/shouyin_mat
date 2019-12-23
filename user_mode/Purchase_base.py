@@ -117,9 +117,6 @@ def purchase_goods(request_body,path):
                 unit_pinlei=payload['unit_pinlei']
                 unit=payload['unit']
                 threshold_remind=payload['threshold_remind']
-
-
-
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
