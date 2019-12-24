@@ -25,6 +25,7 @@ def shop(request_body,path):                                ######店铺管理##
     update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}'" \
                " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, country, logo, date,id)
     if path=='/create_shop':
+        print(request_body)
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                           #查看店铺是否存在
