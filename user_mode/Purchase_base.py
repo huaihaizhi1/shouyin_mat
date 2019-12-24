@@ -5,6 +5,7 @@ from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
 from user_mode.public import *
+import json
 
 
 
@@ -59,6 +60,7 @@ def purchase_goods(request_body,path):
                    pagesize=stop,
                        payload=mysql.getAll(select_sql)
                        )
+        mysql.dispose()
     if path=='/create_purchase':
         mysql=PymysqlPool()
         ########必填项#########
@@ -94,39 +96,66 @@ def purchase_goods(request_body,path):
                    "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchas_price,'0',user_id,user_name,remarks,price_status)
         print(insert_sql)
         mysql.insert(insert_sql)
+        ########货单流水记录##########
+        date = get_date(0, 1)
+
+        insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
+                         "'{4}')".format(shop_id, code_id, date, user_name, '创建')
+        insert_tmp1_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
+                          "'{4}')".format(shop_id, code_id, date, user_name, '确认')
+        mysql.insert(insert_tmp_sql)
+        mysql.insert(insert_tmp1_sql)
+        ################
         if payload=='' or payload==None or payload==[]:
-            ########货单流水记录##########
-            date = get_date(0, 1)
-            insert_tmp_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}',{3}," \
-                           "'{4}','{5}')".format(shop_id,code_id,date,user_name,'创建')
-            insert_tmp1_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}',{3}," \
-                           "'{4}','{5}')".format(shop_id,code_id,date,user_name,'确认')
-            mysql.insert(insert_tmp_sql)
-            mysql.insert(insert_tmp1_sql)
-            ################
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，未添加商品',
                        payload=None
                        )
         else:
+            #####商品插入流程##############
             print(payload)
-            for i in range(0,len(payload)):
-                shop_id=payload['payload']
+            new_s = payload.replace('cnt_"r0x_ratio"', '"cnt_r0x_ratio"')
+            ls = eval(new_s)
+            for i in range(0,len(ls)):
+                shop_id=ls[i]['shop_id']
                 code_id=code_id
-                s_code=payload['s_code']
-                u_code=payload['u_code']
-                s_link=payload['s_link']
-                s_photo=payload['s_photo']
-                name=payload['name']
-                inventory_quantity=payload['inventory_quantity']
-                min_num=payload['min_num']
-                seling_price=payload['seling_price']
-                type_id=payload['type_id']
-                unit_pinlei=payload['unit_pinlei']
-                unit=payload['unit']
-                threshold_remind=payload['threshold_remind']
-                insert_sql="insert into t_goods()"
+                s_code=ls[i]['s_code']
+                u_code=ls[i]['u_code']
+                s_link=ls[i]['s_link']
+                s_photo=ls[i]['s_photo']
+                name=ls[i]['name']
+                inventory_quantity=ls[i]['inventory_quantity']
+                min_num=ls[i]['min_num']
+                seling_price=ls[i]['seling_price']
+                type_id=ls[i]['type_id']
+                unit_pinlei=ls[i]['unit_pinlei']
+                unit=ls[i]['unit']
+                threshold_remind=ls[i]['threshold_remind']
+                insert_sql="insert into t_goods(shop_id,code_id,s_code,u_code,s_link,s_photo,name," \
+                           "inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind,status) values('{0}','{1}'," \
+                           "'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')".format(
+                    shop_id,code_id,s_code,u_code,s_link,s_photo,name,inventory_quantity,min_num,seling_price,type_id
+                    ,unit_pinlei,unit,threshold_remind,'0')
+                mysql.insert(insert_sql)
+            mysql.dispose()
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='货单创建成功，成功添加商品',
+                       payload=None
+                       )
+    if path=='/select_purchase_pro':             ###查看货单详情
+        shop_id = request_body.get('id')
+        code_id = request_body.get('code_id')
+        mysql=PymysqlPool()
+        select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_2="select id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        print(mysql.getAll(select_sql_1))
+        print(mysql.getAll(select_sql_2))
+        print(mysql.getAll(select_sql_3))
+        m1=mysql.getAll(select_sql_1)
+        mysql.dispose()
+    #####还需要分页功能#######
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)

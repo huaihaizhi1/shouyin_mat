@@ -13,17 +13,16 @@ def shop(request_body,path):                                ######店铺管理##
     shop_jc=request_body.get('shop_jc',None)
     province=request_body.get('province',None)
     city=request_body.get('city',None)
-    country=request_body.get('country',None)
-    street=request_body.get('street',None)
+    area=request_body.get('area',None)
     address=request_body.get('address',None)
     logo=request_body.get('logo',None)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,country,logo from shop_base where shop_id="%s" ' % id
     insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,country,logo,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
-        .format(id, shop_jc, shop_name, address, province, city, country, logo, date, date)
+        .format(id, shop_jc, shop_name, address, province, city, area, logo, date, date)
     update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}'" \
-               " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, country, logo, date,id)
+               " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, area, logo, date,id)
     if path=='/create_shop':
         print(request_body)
         mysql = PymysqlPool()
@@ -34,6 +33,7 @@ def shop(request_body,path):                                ######店铺管理##
                        payload=None
                        )
         else:
+            print(insert_sql)
             mysql.insert(insert_sql)                           #店铺创建
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',

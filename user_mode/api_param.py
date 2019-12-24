@@ -23,12 +23,12 @@ class api_param(object):
     #忘记密码/forger_user
     forget_user1={'mast_info':'telnumber,pwd','info':'telnumber,pwd'}
     ########创建店铺######
-    create_shop={'mast_info':'id,shop_jc,shop_name,address,province,city,country,street'}
+    create_shop={'mast_info':'id,shop_jc,shop_name,address,province,city,area'}
     ######查看店铺信息
     select_shop_info = {'mast_info': 'id',
-                        'info': 'id,shop_id,shop_name,shop_jc,province,city,country,street,address,logo'}
+                        'info': 'id,shop_id,shop_name,shop_jc,province,city,area,address,logo'}
     #######店铺信息修改#####
-    update_shop={'mast_info':'id,shop_jc,shop_name,address,province,city,country,street,logo'}
+    update_shop={'mast_info':'id,shop_jc,shop_name,address,province,city,area,logo'}
     #######员工创建#####
     create_employess={'mast_info': 'id,staff_id,staff_name','info':'id,shop_id,staff_id,staff_name'}
     #######员工修改#####
@@ -49,6 +49,8 @@ class api_param(object):
     select_purchase={'mast_info':'id,pageNo,pagesize,status','info':'id,shop_id'}
     ######货单新增###########
     create_purchase={'mast_info':'id,purchase_date,purchas_price,user_id,user_name,price_status,payload,remarks'}
+    #####查看货单详情#####
+    select_purchase_pro={'mast_info':'id,code_id'}
     ##########供应商查看####
     select_supplier={'mast_info':'id,pageNo,pagesize'}
     #######供应商修改#######
