@@ -95,6 +95,15 @@ def purchase_goods(request_body,path):
         print(insert_sql)
         mysql.insert(insert_sql)
         if payload=='' or payload==None or payload==[]:
+            ########货单流水记录##########
+            date = get_date(0, 1)
+            insert_tmp_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}',{3}," \
+                           "'{4}','{5}')".format(shop_id,code_id,date,user_name,'创建')
+            insert_tmp1_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}',{3}," \
+                           "'{4}','{5}')".format(shop_id,code_id,date,user_name,'确认')
+            mysql.insert(insert_tmp_sql)
+            mysql.insert(insert_tmp1_sql)
+            ################
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，未添加商品',
@@ -117,6 +126,7 @@ def purchase_goods(request_body,path):
                 unit_pinlei=payload['unit_pinlei']
                 unit=payload['unit']
                 threshold_remind=payload['threshold_remind']
+                insert_sql="insert into t_goods()"
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)

@@ -18,12 +18,12 @@ def shop(request_body,path):                                ######店铺管理##
     address=request_body.get('address',None)
     logo=request_body.get('logo',None)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,country,logo,street from shop_base where shop_id="%s" ' % id
-    insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,country,logo,create_time,update_time,street) " \
-                 "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')" \
-        .format(id, shop_jc, shop_name, address, province, city, country, logo, date, date, street)
-    update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}',street='{8}'" \
-               " where  shop_id='{9}'".format( shop_jc, shop_name, address, province, city, country, logo, date, street,id)
+    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,country,logo from shop_base where shop_id="%s" ' % id
+    insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,country,logo,create_time,update_time) " \
+                 "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
+        .format(id, shop_jc, shop_name, address, province, city, country, logo, date, date)
+    update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}'" \
+               " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, country, logo, date,id)
     if path=='/create_shop':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
