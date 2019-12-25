@@ -146,16 +146,76 @@ def purchase_goods(request_body,path):
     if path=='/select_purchase_pro':             ###查看货单详情
         shop_id = request_body.get('id')
         code_id = request_body.get('code_id')
+        pageNo_s = request_body.get('pageNo_s')
+        pagesize_s = request_body.get('pagesize_s')
+        start_s=int(int(pageNo_s)-1)*int(pagesize_s)
+        stop_s=pagesize_s
+        limit_s=" order by id desc limit {0}, {1}".format(start_s,stop_s)
+        pageNo_t = request_body.get('pageNo_t')
+        pagesize_t = request_body.get('pagesize_t')
+        start_t=int(int(pageNo_t)-1)*int(pagesize_t)
+        stop_t=pagesize_t
+        limit_t=" order by id desc limit {0}, {1}".format(start_t,stop_t)
         mysql=PymysqlPool()
         select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_2="select id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         print(mysql.getAll(select_sql_1))
-        print(mysql.getAll(select_sql_2))
-        print(mysql.getAll(select_sql_3))
+        print(mysql.getAll(select_sql_2+limit_s))
+        print(mysql.getAll(select_sql_3+limit_t))
         m1=mysql.getAll(select_sql_1)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='货单详情查看',
+                   payload=None
+                   )
+        ######货单数据展现还要继续参考，未完成##
         mysql.dispose()
-    #####还需要分页功能#######
+    if path=='/update_purchase':
+        mysql=PymysqlPool()
+        date = get_date(0, 0)
+        shop_id=request_body.get('id')
+        code_id=request_body.get('code_id')
+        status=request_body.get('status')
+        purchas_price=request_body.get('purchas_price')
+        price_status=request_body.get('price_status')
+        user_name=request_body.get('user_name')
+        remarks=request_body.get('remarks')
+        ######查询修改参数记录流水############
+        select_sql="select status,purchas_price,price_status from t_purchase_table where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
+        print(mysql.getAll(select_sql))
+        rrr=mysql.getAll(select_sql)
+        update_purchase_sql="update t_purchase_table set status='{0}',purchas_price='{1}',price_status='{2}'  where shop_id='{3}' and code_id='{4}'".format(
+            status,purchas_price,price_status,shop_id,code_id)
+        mysql.update(update_purchase_sql)
+        if str(status)!=str(rrr[0]['status']) and str(rrr[0]['status'])=='0':
+            #####货单流水修改####
+            insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
+                       "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'作废(商品信息删除)',remarks)
+            mysql.insert(insert_sql)
+            ########作废后商品数据修改#######
+            insert_sql1="update t_goods set status=1 where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
+            mysql.insert(insert_sql1)
+        if str(purchas_price)!=str(rrr[0]['purchas_price']):
+            ########商品金额修改
+            mt='金额由{0}修改为{1}'.format(rrr[0]['purchas_price'],purchas_price)
+            insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
+                       "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,mt,remarks)
+            mysql.insert(insert_sql)
+        if str(price_status)!=str(rrr[0]['price_status']):
+            ########商品金额修改
+            if str(price_status)=='1':
+                insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
+                       "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'修改成未付款',remarks)
+                mysql.insert(insert_sql)
+            if str(price_status)=='0':
+                insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
+                       "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'修改成已付款',remarks)
+                mysql.insert(insert_sql)
+        mysql.dispose()
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='货单修改成功',
+                   payload=None
+                   )
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)

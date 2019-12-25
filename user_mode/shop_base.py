@@ -12,13 +12,29 @@ def shop(request_body,path):                                ######店铺管理##
     id=request_body.get('id')
     shop_name=request_body.get('shop_name',None)
     shop_jc=request_body.get('shop_jc',None)
-    province=mysql.getAll("select name as province from province where code={0}".format(request_body.get('province')))[0]['province']
-    city=mysql.getAll("select name as city from city where code={0}".format(request_body.get('city')))[0]['city']
-    area=mysql.getAll("select name as area from area where code={0}".format(request_body.get('area')))[0]['area']
+    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
+    if path=='/select_shop':
+        resluts = mysql.getAll(select_sql)
+        if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='操作成功',
+                       payload=resluts[0]
+                       )
+        else:
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='店铺不存在',
+                        payload = None)
+        mysql.dispose()
+        resp = make_response(res)
+        resp.headers['Content-Type'] = 'text/json'
+        return jsonify(res)
+    if request_body.get('province',None)!=None:
+        province=mysql.getAll("select name as province from province where code={0}".format(request_body.get('province')))[0]['province']
+        city=mysql.getAll("select name as city from city where code={0}".format(request_body.get('city')))[0]['city']
+        area=mysql.getAll("select name as area from area where code={0}".format(request_body.get('area')))[0]['area']
     address=request_body.get('address',None)
     logo=request_body.get('logo',None)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
     insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,area,logo,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
         .format(id, shop_jc, shop_name, address, province, city, area, logo, date, date)
@@ -53,17 +69,6 @@ def shop(request_body,path):                                ######店铺管理##
                        msg='用户未开店',
                        payload=None
                        )
-    if path=='/select_shop':
-        resluts = mysql.getAll(select_sql)
-        if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
-            res = dict(code=ResponseCode.SUCCESS,
-                       msg='操作成功',
-                       payload=resluts[0]
-                       )
-        else:
-            res = dict(code=ResponseCode.SUCCESS,
-                       msg='店铺不存在',
-                        payload = None)
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
