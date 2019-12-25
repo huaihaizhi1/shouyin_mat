@@ -8,25 +8,26 @@ import time
 
 def shop(request_body,path):                                ######店铺管理##########
     #####获取form格式的请求体并解析
+    mysql = PymysqlPool()
     id=request_body.get('id')
     shop_name=request_body.get('shop_name',None)
     shop_jc=request_body.get('shop_jc',None)
-    province=request_body.get('province',None)
-    city=request_body.get('city',None)
-    area=request_body.get('area',None)
+    province=mysql.getAll("select name as province from province where code={0}".format(request_body.get('province')))[0]['province']
+    city=mysql.getAll("select name as city from city where code={0}".format(request_body.get('city')))[0]['city']
+    area=mysql.getAll("select name as area from area where code={0}".format(request_body.get('area')))[0]['area']
     address=request_body.get('address',None)
     logo=request_body.get('logo',None)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,country,logo from shop_base where shop_id="%s" ' % id
-    insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,country,logo,create_time,update_time) " \
+    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
+    insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,area,logo,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
         .format(id, shop_jc, shop_name, address, province, city, area, logo, date, date)
-    update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',country='{5}',logo='{6}',update_time='{7}'" \
+    update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',area='{5}',logo='{6}',update_time='{7}'" \
                " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, area, logo, date,id)
     if path=='/create_shop':
         print(request_body)
-        mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
+
         if resluts!=[]:                           #查看店铺是否存在
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已创建',
@@ -39,9 +40,7 @@ def shop(request_body,path):                                ######店铺管理##
                        msg='操作成功',
                        payload=None
                        )
-            mysql.dispose()
     if path=='/update_shop':
-        mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                       #查看店铺是否存在
             mysql.update(update_sql)                       #修改店铺信息
@@ -49,25 +48,23 @@ def shop(request_body,path):                                ######店铺管理##
                        msg='修改成功',
                        payload=None
                        )
-            mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户未开店',
                        payload=None
                        )
     if path=='/select_shop':
-        mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload=resluts[0]
                        )
-            mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='店铺不存在',
                         payload = None)
+    mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
     return jsonify(res)
