@@ -61,3 +61,5 @@ class api_param(object):
     delete_supplier={'mast_info':'id,proc_id'}
     ######供应商添加########
     insert_supplier={'mast_info':'id,name,number,address,contact'}
+    ######商品查看#########
+    select_goods={'mast_info':'id,status'}
