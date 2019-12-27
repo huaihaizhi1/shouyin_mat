@@ -15,7 +15,7 @@ def shop(request_body,path):                                ######店铺管理##
     #select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
     select_sql="select shop_id,shop_jc,shop_name,address,b.`name` as province,a.province as province_code,"\
                 "c.`name` as city , a.city as city_code,a.area as area_code,d.`name` as area,logo from shop_base a,province b,"\
-                "city c, area d where shop_id='26' and a.province=b.`code` and a.city=c.`code` and a.area=d.`code`".format(shop_id)
+                "city c, area d where shop_id='{0}' and a.province=b.`code` and a.city=c.`code` and a.area=d.`code`".format(shop_id)
     if path=='/select_shop':
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
@@ -43,9 +43,9 @@ def shop(request_body,path):                                ######店铺管理##
     area=request_body.get('area')
     insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,area,logo,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
-        .format(id, shop_jc, shop_name, address, province, city, area, logo, date, date)
+        .format(shop_id, shop_jc, shop_name, address, province, city, area, logo, date, date)
     update_sql="update shop_base set shop_jc='{0}',shop_name='{1}',address='{2}',province='{3}',city='{4}',area='{5}',logo='{6}',update_time='{7}'" \
-               " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, area, logo, date,id)
+               " where  shop_id='{8}'".format( shop_jc, shop_name, address, province, city, area, logo, date,shop_id)
     if path=='/create_shop':
         print(request_body)
         resluts = mysql.getAll(select_sql)
@@ -70,6 +70,7 @@ def shop(request_body,path):                                ######店铺管理##
                        msg='修改成功',
                        payload=None
                        )
+            mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户未开店',
