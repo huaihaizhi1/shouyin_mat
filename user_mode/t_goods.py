@@ -14,8 +14,8 @@ def t_goods(request_body,path):
     mysql=PymysqlPool
     shop_id=request_body.get('id')
     if path=='/select_goods':
-        pageNo = request_body.get('pageNo')
-        pagesize = request_body.get('pagesize')
+        page = request_body.get('page')
+        pageSize = request_body.get('pageSize')
         select_sql="select name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}'".format(shop_id)
 
 

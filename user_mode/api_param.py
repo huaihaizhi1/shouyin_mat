@@ -34,7 +34,7 @@ class api_param(object):
     #######员工修改#####
     update_employess={'mast_info': 'id,staff_id,staff_name','info':'id,shop_id,staff_id,staff_name'}
     #####员工信息######
-    staff_info={'mast_info': 'id,pageNo,pagesize','info':'id,shop_id,staff_id,staff_name'}
+    staff_info={'mast_info': 'id,page,pageSize','info':'id,shop_id,staff_id,staff_name'}
     #######员工删除#####
     delete_employess={'mast_info': 'id,staff_id','info':'id,shop_id,staff_id,staff_name'}
     #######商品分类查看####
@@ -46,7 +46,7 @@ class api_param(object):
     #######商品分类查看####
     create_catalog={'mast_info':'id,name,s_id','info':'id,shop_id'}
     ###货单主页查询###########
-    select_purchase={'mast_info':'id,pageNo,pagesize,status','info':'id,shop_id'}
+    select_purchase={'mast_info':'id,page,pageSize,status','info':'id,shop_id'}
     ######货单新增###########
     create_purchase={'mast_info':'id,purchase_date,purchas_price,user_id,user_name,price_status,payload'}
     #####查看货单详情#####
@@ -54,7 +54,7 @@ class api_param(object):
     #####货单修改#####
     update_purchase={'mast_info':'id,code_id,status,purchas_price,price_status,user_name'}
     ##########供应商查看####
-    select_supplier={'mast_info':'id,pageNo,pagesize'}
+    select_supplier={'mast_info':'id,page,pageSize'}
     #######供应商修改#######
     update_supplier={'mast_info':'id,name,number,address,contact,proc_id'}
     ######供应商删除########

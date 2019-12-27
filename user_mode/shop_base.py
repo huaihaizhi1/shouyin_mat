@@ -9,10 +9,13 @@ import time
 def shop(request_body,path):                                ######店铺管理##########
     #####获取form格式的请求体并解析
     mysql = PymysqlPool()
-    id=request_body.get('id')
+    shop_id=request_body.get('id')
     shop_name=request_body.get('shop_name',None)
     shop_jc=request_body.get('shop_jc',None)
-    select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
+    #select_sql = 'select shop_id,shop_jc,shop_name,address,province,city,area,logo from shop_base where shop_id="%s" ' % id
+    select_sql="select shop_id,shop_jc,shop_name,address,b.`name` as province,a.province as province_code,"\
+                "c.`name` as city , a.city as city_code,a.area as area_code,d.`name` as area,logo from shop_base a,province b,"\
+                "city c, area d where shop_id='26' and a.province=b.`code` and a.city=c.`code` and a.area=d.`code`".format(shop_id)
     if path=='/select_shop':
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                       #查看店铺是否存在并返回店铺数据
@@ -28,13 +31,16 @@ def shop(request_body,path):                                ######店铺管理##
         resp = make_response(res)
         resp.headers['Content-Type'] = 'text/json'
         return jsonify(res)
-    if request_body.get('province',None)!=None:
-        province=mysql.getAll("select name as province from province where code={0}".format(request_body.get('province')))[0]['province']
-        city=mysql.getAll("select name as city from city where code={0}".format(request_body.get('city')))[0]['city']
-        area=mysql.getAll("select name as area from area where code={0}".format(request_body.get('area')))[0]['area']
+    # if request_body.get('province',None)!=None:
+    #     province=mysql.getAll("select name as province from province where code={0}".format(request_body.get('province')))[0]['province']
+    #     city=mysql.getAll("select name as city from city where code={0}".format(request_body.get('city')))[0]['city']
+    #     area=mysql.getAll("select name as area from area where code={0}".format(request_body.get('area')))[0]['area']
     address=request_body.get('address',None)
     logo=request_body.get('logo',None)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    province=request_body.get('province')
+    city=request_body.get('city')
+    area=request_body.get('area')
     insert_sql = "insert into shop_base(shop_id,shop_jc,shop_name,address,province,city,area,logo,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')" \
         .format(id, shop_jc, shop_name, address, province, city, area, logo, date, date)
@@ -80,9 +86,9 @@ def staff_user(request_body,path):                  #####导购员管理########
     id=request_body.get('id')
     staff_id=request_body.get('staff_id',None)
     staff_name=request_body.get('staff_name',None)
-    pageNo=request_body.get('pageNo')
-    pagesize=request_body.get('pagesize')
-    select_sql = 'select staff_id,staff_name from staff_user_table where shop_id="{0}" and status="{1}" '.format(id,'0')
+    page=request_body.get('page')
+    pageSize=request_body.get('pageSize')
+    select_sql = 'select id as proc_id,staff_id,staff_name,create_time from staff_user_table where shop_id="{0}" and status="{1}" '.format(id,'0')
     insert_sql = "insert into staff_user_table(shop_id,staff_id,staff_name,status,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','0','{3}','{4}')" \
         .format(id, staff_id, staff_name,date,date)
@@ -123,21 +129,22 @@ def staff_user(request_body,path):                  #####导购员管理########
                        )
     if path=='/select_employess':
         mysql = PymysqlPool()
+        print(select_sql)
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:
-            start = int(int(pageNo) - 1) * int(pagesize)
-            stop = pagesize
+            start = int(int(page) - 1) * int(pageSize)
+            stop = pageSize
             limit1 = " order by id desc limit {0}, {1}".format(start, stop)
             select_sql = select_sql + limit1
             print(select_sql)
             total_sql = "select count(id) as total from staff_user_table where shop_id='{0}' and status=0".format(id)
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
-                       total=mysql.getAll(total_sql)[0]['total'],
-                       page=start,
-                       pagesize=stop,
-                       payload=resluts
-                       )
+                       payload=dict(page=start,
+                                    total=mysql.getAll(total_sql)[0]['total'],
+                                    pageSize=stop,
+                                    pageData=resluts,
+                                    key='proc_id'))
             mysql.dispose()
         else:
             res = dict(code=ResponseCode.SUCCESS,

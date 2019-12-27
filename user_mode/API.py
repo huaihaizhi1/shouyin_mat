@@ -109,7 +109,10 @@ def create_shop():
 @server.route('/select_shop',methods=["POST","GET"])           ####查看开店信息########
 def select_shop():
     dict1 = api_param.select_shop_info  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -154,7 +157,10 @@ def update_employess():
 @server.route('/select_employess',methods=["POST","GET"])           ####查看店员信息########
 def select_employess():
     dict1 = api_param.staff_info  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -177,8 +183,11 @@ def delete_employess():
 
 @server.route('/select_catalog',methods=["POST","GET"])           ####查看分类信息########
 def select_catalog():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.select_catalog  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -242,8 +251,11 @@ def area():
 
 @server.route('/select_purchase',methods=["POST","GET"])           ####查看货单列表########
 def select_purchase():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.select_purchase  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -267,8 +279,11 @@ def create_purchase():
 
 @server.route('/select_purchase_pro',methods=["POST","GET"])           ####查看货单详情########
 def select_purchase_pro():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -291,8 +306,11 @@ def update_purchase():
 
 @server.route('/select_supplier',methods=["POST","GET"])           ####查看供应商信息########
 def select_supplier():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.select_purchase  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
@@ -341,8 +359,11 @@ def insert_supplier():
 
 @server.route('/select_goods',methods=["POST","GET"])           ####新增供应商########
 def select_goods():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.select_goods  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
