@@ -16,6 +16,11 @@ def t_goods(request_body,path):
     if path=='/select_goods':
         page = request_body.get('page')
         pageSize = request_body.get('pageSize')
-        select_sql="select name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}'".format(shop_id)
-
+        start=int(int(page)-1)*int(pageSize)
+        status=request_body.get('status')
+        stop=pageSize
+        limit=" order by id desc limit {0}, {1}".format(start,stop)
+        select_sql="select name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}' " \
+                   "and status='{1}'".format(shop_id,status)
+        list1=['name','start_seling_price','end_seling_price','s_code','inventory_quantity','seling_price']
 

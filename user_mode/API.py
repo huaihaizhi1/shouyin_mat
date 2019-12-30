@@ -277,8 +277,8 @@ def create_purchase():
     return res
 
 
-@server.route('/select_purchase_pro',methods=["POST","GET"])           ####查看货单详情########
-def select_purchase_pro():
+@server.route('/select_purchase_pro1',methods=["POST","GET"])           ####查看货单详情_基本信息查看########
+def select_purchase_pro1():
     if request.method=='POST':
         request_body = request.form  # 获取接口表单参数
     elif request.method=='GET':
@@ -291,6 +291,37 @@ def select_purchase_pro():
     else:
         res = res1  # 接口返回不为200则提示错误系信息
     return res
+
+@server.route('/select_purchase_pro2',methods=["POST","GET"])           ####查看货单详情_商品信息查看########
+def select_purchase_pro2():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+@server.route('/select_purchase_pro3',methods=["POST","GET"])           ####查看货单详情_操作日志查看########
+def select_purchase_pro3():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
 
 @server.route('/update_purchase',methods=["POST","GET"])           ####货单修改########
 def update_purchase():
@@ -310,7 +341,7 @@ def select_supplier():
         request_body = request.form  # 获取接口表单参数
     elif request.method=='GET':
         request_body = request.args
-    dict1 = api_param.select_purchase  # 获取接口参数必填项与参数列表(需要修改)
+    dict1 = api_param.select_supplier  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200

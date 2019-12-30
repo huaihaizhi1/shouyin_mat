@@ -72,7 +72,7 @@ def shop(request_body,path):                                ######店铺管理##
                        )
             mysql.dispose()
         else:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                        msg='用户未开店',
                        payload=None
                        )
@@ -102,7 +102,7 @@ def staff_user(request_body,path):                  #####导购员管理########
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
         if resluts!=[]:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                        msg='用户已存在',
                        payload=None
                        )
@@ -124,7 +124,7 @@ def staff_user(request_body,path):                  #####导购员管理########
                        )
             mysql.dispose()
         else:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                        msg='用户不存在',
                        payload=None
                        )
@@ -132,25 +132,20 @@ def staff_user(request_body,path):                  #####导购员管理########
         mysql = PymysqlPool()
         print(select_sql)
         resluts = mysql.getAll(select_sql)
-        if resluts!=[]:
-            start = int(int(page) - 1) * int(pageSize)
-            stop = pageSize
-            limit1 = " order by id desc limit {0}, {1}".format(start, stop)
-            select_sql = select_sql + limit1
-            print(select_sql)
-            total_sql = "select count(id) as total from staff_user_table where shop_id='{0}' and status=0".format(id)
-            res = dict(code=ResponseCode.SUCCESS,
-                       msg='操作成功',
-                       payload=dict(page=start,
-                                    total=mysql.getAll(total_sql)[0]['total'],
-                                    pageSize=stop,
-                                    pageData=resluts,
-                                    key='proc_id'))
-            mysql.dispose()
-        else:
-            res = dict(code=ResponseCode.SUCCESS,
-                       msg='未添加店员',
-                       payload=None)
+        start = int(int(page) - 1) * int(pageSize)
+        stop = pageSize
+        limit1 = " order by id desc limit {0}, {1}".format(start, stop)
+        select_sql = select_sql + limit1
+        print(select_sql)
+        total_sql = "select count(id) as total from staff_user_table where shop_id='{0}' and status=0".format(id)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='操作成功',
+                   payload=dict(page=start,
+                                total=mysql.getAll(total_sql)[0]['total'],
+                                pageSize=stop,
+                                pageData=resluts,
+                                key='proc_id'))
+        mysql.dispose()
     if path=='/delete_employess':
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
@@ -162,7 +157,7 @@ def staff_user(request_body,path):                  #####导购员管理########
                        )
             mysql.dispose()
         else:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                        msg='用户不存在',
                        payload=None
                     )
@@ -219,7 +214,7 @@ def catalog(request_body,path):                         #######商品分类管�
                payload=None
                )
         else:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                msg='id不存在',
                payload=None
                )

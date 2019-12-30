@@ -13,51 +13,48 @@ def purchase_goods(request_body,path):
     id=request_body.get('id')
     #date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if path=='/select_purchase':
+        shop_id=request_body.get('id')
         page = request_body.get('page')
         pageSize = request_body.get('pageSize')
-        if request_body.get('start_data')=='':
-            start_data=get_date(7,1)
-        else:
-            start_data = request_body.get('start_data')
-        if request_body.get('end_data')=='':
-            end_data=get_date(0,1)
-        else:
-            end_data = request_body.get('end_data')
-        if request_body.get('start_price')=='' or request_body.get('start_price')==None:
-            start_price='0'
-        else:
-            start_price = request_body.get('start_price')
-        if request_body.get('end_price')=='' or request_body.get('end_price')==None:
-            end_price='99999999999'
-        else:
-            end_price = request_body.get('end_price')
-        mysql = PymysqlPool()
-        list1=['code_id','suppiler_name','price_status','purchase_no','user_name']
-        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchas_price,price_status,user_name from t_purchase_table where shop_id='{0}'" \
-                   " and purchase_date>={1} and purchase_date<={2} and purchas_price>={3} and purchas_price<={4} ".format(id,start_data,end_data,start_price,end_price)
-        list2=[]
-        for i in request_body:
-            if i in list1:
-                if request_body.get(i)!='':
-                    list2.append(i)
-        print(list2)
-        tmp_sql1=''
-        for i  in range(0,len(list2)):
-            tmp_sql=" and {0}='{1}' ".format(list2[i], request_body.get(list2[i]))
-            tmp_sql1=tmp_sql1+tmp_sql
-        select_sql=select_sql+tmp_sql1
         start=int(int(page)-1)*int(pageSize)
         stop=pageSize
-        limit1=" order by id desc limit {0}, {1}".format(start,stop)
-        select_sql=select_sql+limit1
+        limit=" order by id desc limit {0}, {1}".format(start,stop)
+        list1=['code_id','suppiler_name','price_status','start_price','end_price','user_name','status']
+        tmp_sql1=""
+        for i in request_body:
+            if i in list1:
+                if request_body.get(i)=='':
+                    continue
+                elif request_body.get(i)=='-1':
+                    continue
+                elif i=='code_id':
+                    tmp_sql=" and (code_id like '%{0}%' or purchase_no like '%{0}%')".format(request_body.get(i))
+                elif i=='start_price':
+                    tmp_sql=" and purchas_price >={0}".format(request_body.get(i))
+                elif i=='end_price':
+                    tmp_sql=" and purchas_price <={0}".format(request_body.get(i))
+                elif i=='start_date':
+                    tmp_sql=" and purchase_date >={0}".format(request_body.get(i))
+                elif i=='end_date':
+                    tmp_sql=" and purchase_date <={0}".format(request_body.get(i))
+                else:
+                    tmp_sql = " and {0}='{1}' ".format(i, request_body.get(i))
+                tmp_sql1=tmp_sql1+tmp_sql
+        print(tmp_sql1)
+        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchas_price,price_status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
+        select_sql=select_sql+tmp_sql1
+        select_sql=select_sql+limit
         print(select_sql)
-        total_sql="select count(id) as total from t_purchase_table where shop_id='{0}'".format(id)
+        mysql = PymysqlPool()
+        print(select_sql)
+        resluts=mysql.getAll(select_sql)
+        total_sql=len(resluts)
         res = dict(code=ResponseCode.SUCCESS,
                        msg='查询成功',
                    payload=dict(page=start,
-                                total=mysql.getAll(total_sql)[0]['total'],
+                                total=total_sql,
                                 pageSize=stop,
-                                pageData=mysql.getAll(select_sql),
+                                pageData=resluts,
                                 key='proc_id'))
         mysql.dispose()
     if path=='/create_purchase':
@@ -131,42 +128,89 @@ def purchase_goods(request_body,path):
                 unit_pinlei=ls[i]['unit_pinlei']
                 unit=ls[i]['unit']
                 threshold_remind=ls[i]['threshold_remind']
+                ####货单商品新增######
                 insert_sql="insert into t_goods(shop_id,code_id,s_code,u_code,s_link,s_photo,name," \
                            "inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind,status) values('{0}','{1}'," \
                            "'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')".format(
                     shop_id,code_id,s_code,u_code,s_link,s_photo,name,inventory_quantity,min_num,seling_price,type_id
                     ,unit_pinlei,unit,threshold_remind,'0')
                 mysql.insert(insert_sql)
+                ####货单商品流水新增#####
+                ####查看直接查询流水表####
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，成功添加商品',
                        payload=None
                        )
-    if path=='/select_purchase_pro':             ###查看货单详情
+    if path=='/select_purchase_pro1':             ###查看货单详情_基本信息查看
         shop_id = request_body.get('id')
         code_id = request_body.get('code_id')
-        page_s = request_body.get('page_s')
-        pageSize_s = request_body.get('pageSize_s')
-        start_s=int(int(page_s)-1)*int(pageSize_s)
-        stop_s=pageSize_s
-        limit_s=" order by id desc limit {0}, {1}".format(start_s,stop_s)
-        page_t = request_body.get('page_t')
-        pageSize_t = request_body.get('pageSize_t')
-        start_t=int(int(page_t)-1)*int(pageSize_t)
-        stop_t=pageSize_t
-        limit_t=" order by id desc limit {0}, {1}".format(start_t,stop_t)
+        page = request_body.get('page')
+        pageSize = request_body.get('pageSize')
+        start=int(int(page)-1)*int(pageSize)
+        stop=pageSize
+        limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
         select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_2="select id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
-        print(mysql.getAll(select_sql_1))
-        print(mysql.getAll(select_sql_2+limit_s))
-        print(mysql.getAll(select_sql_3+limit_t))
         m1=mysql.getAll(select_sql_1)
+        print(select_sql_1)
         res = dict(code=ResponseCode.SUCCESS,
-                   msg='货单详情查看',
-                   payload=None
+                   msg='货单详情查看_基本信息',
+                   payload=m1
                    )
+        ######货单数据展现还要继续参考，未完成##
+        mysql.dispose()
+    if path=='/select_purchase_pro2':             ###查看货单详情_基本信息查看
+        shop_id = request_body.get('id')
+        code_id = request_body.get('code_id')
+        page = request_body.get('page')
+        pageSize = request_body.get('pageSize')
+        start=int(int(page)-1)*int(pageSize)
+        stop=pageSize
+        limit=" order by id desc limit {0}, {1}".format(start,stop)
+        mysql=PymysqlPool()
+        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_2="select id as proc_id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        #select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        resluts=mysql.getAll(select_sql_2+limit)
+        print(select_sql_2+limit)
+        print(resluts)
+        select_sql_2="select count(*) as total from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='操作成功',
+                   payload=dict(page=start,
+                                total=mysql.getAll(select_sql_2)[0]['total'],
+                                pageSize=stop,
+                                pageData=resluts,
+                                key='proc_id'))
+        ######货单数据展现还要继续参考，未完成##
+        mysql.dispose()
+    if path=='/select_purchase_pro3':             ###查看货单详情_基本信息查看
+        shop_id = request_body.get('id')
+        code_id = request_body.get('code_id')
+        page = request_body.get('page')
+        pageSize = request_body.get('pageSize')
+        start=int(int(page)-1)*int(pageSize)
+        stop=pageSize
+        limit=" order by id desc limit {0}, {1}".format(start,stop)
+        mysql=PymysqlPool()
+        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        #select_sql_2="select id as proc_id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        resluts=mysql.getAll(select_sql_3+limit)
+        print(select_sql_3+limit)
+        print(resluts)
+        select_sql_3="select count(*) as total from t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        print(select_sql_3)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='操作成功',
+                   payload=dict(page=start,
+                                total=mysql.getAll(select_sql_3)[0]['total'],
+                                pageSize=stop,
+                                pageData=resluts,
+                                key='proc_id'))
         ######货单数据展现还要继续参考，未完成##
         mysql.dispose()
     if path=='/update_purchase':
@@ -225,30 +269,43 @@ def supplier_api(request_body,path):
     mysql = PymysqlPool()
     if path=='/select_supplier':
         shop_id=request_body.get('id')
-        page = request_body.get('page')
-        pageSize = request_body.get('pageSize')
-        start=int(int(page)-1)*int(pageSize)
-        stop=pageSize
-        name=request_body.get('name')
-        select_sql=" select id as proc_id,name,number,address,contact,last_act_date,remarks from t_supplier where shop_id={0} and status='0'}".format(shop_id,)
-        limit1=" order by id desc limit {0}, {1}".format(start,stop)
-        if name=='' or name==None:
-            select_sql=select_sql+limit1
-        else:
-            select_sql = " select id as proc_id,name,number,address,contact,last_act_date,remarks from t_supplier where shop_id={0} and ststus='0' and name like '%{1}%'".format(
-                shop_id,name)
-            select_sql=select_sql+limit1
+        list1=['name','page']
+        tmp_sql1=""
+        limit=''
+        tmp_sql=''
+        for i in request_body:
+            if i in list1:
+                if request_body.get(i)=='' or request_body.get(i)==None:
+                    continue
+                elif i=='name':
+                    tmp_sql=" and name like '%{0}%'".format(request_body.get(i))
+                elif i=='page':
+                    page = request_body.get('page')
+                    pageSize = request_body.get('pageSize')
+                    start = int(int(page) - 1) * int(pageSize)
+                    stop = pageSize
+                    limit = " order by id desc limit {0}, {1}".format(start, stop)
+                tmp_sql1=tmp_sql1+tmp_sql
+        select_sql=" select id as proc_id,name,number,address,contact,last_act_date,remarks from t_supplier where shop_id={0} and status='0'".format(shop_id)
+        select_sql=select_sql+tmp_sql1+limit
         print(select_sql)
         resluts=mysql.getAll(select_sql)
         total_sql="select count(*) as total from t_supplier where shop_id={0} and status='0'".format(shop_id)
-        res = dict(code=ResponseCode.SUCCESS,
+        if len(limit)==0:
+            res = dict(code=ResponseCode.SUCCESS,
                        msg='查询成功',
-                    payload = dict(page=start,
-                       total=mysql.getAll(total_sql)[0]['total'],
-                       pageSize=stop,
-                       pageData=resluts,
-                       key='proc_id'))
-
+                       payload=dict(
+                                    total=mysql.getAll(total_sql)[0]['total'],
+                                    pageData=resluts,
+                                    key='proc_id'))
+        else:
+            res = dict(code=ResponseCode.SUCCESS,
+                           msg='查询成功',
+                        payload = dict(page=start,
+                           total=mysql.getAll(total_sql)[0]['total'],
+                           pageSize=stop,
+                           pageData=resluts,
+                           key='proc_id'))
     if path=='/update_supplier':
         shop_id=request_body.get('id')
         name=request_body.get('name')
