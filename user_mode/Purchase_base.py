@@ -21,6 +21,7 @@ def purchase_goods(request_body,path):
         limit=" order by id desc limit {0}, {1}".format(start,stop)
         list1=['code_id','suppiler_name','price_status','start_price','end_price','user_name','status']
         tmp_sql1=""
+        tmp_sql=""
         for i in request_body:
             if i in list1:
                 if request_body.get(i)=='':
@@ -30,9 +31,9 @@ def purchase_goods(request_body,path):
                 elif i=='code_id':
                     tmp_sql=" and (code_id like '%{0}%' or purchase_no like '%{0}%')".format(request_body.get(i))
                 elif i=='start_price':
-                    tmp_sql=" and purchas_price >={0}".format(request_body.get(i))
+                    tmp_sql=" and purchase_price >={0}".format(request_body.get(i))
                 elif i=='end_price':
-                    tmp_sql=" and purchas_price <={0}".format(request_body.get(i))
+                    tmp_sql=" and purchase_price <={0}".format(request_body.get(i))
                 elif i=='start_date':
                     tmp_sql=" and purchase_date >={0}".format(request_body.get(i))
                 elif i=='end_date':
@@ -41,7 +42,7 @@ def purchase_goods(request_body,path):
                     tmp_sql = " and {0}='{1}' ".format(i, request_body.get(i))
                 tmp_sql1=tmp_sql1+tmp_sql
         print(tmp_sql1)
-        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchas_price,price_status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
+        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
         select_sql=select_sql+tmp_sql1
         select_sql=select_sql+limit
         print(select_sql)

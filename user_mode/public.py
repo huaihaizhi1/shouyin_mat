@@ -9,21 +9,25 @@ def Required_verification(request_body,dict1):       ###必填项检查
         m=0                                             #用于判断必填项是否都填了
         str=''                                          #用于错误信息提示
         for i in range(0,len(aa)):                      #循环判断必填项检查
-            if request_body.get(aa[i]) or request_body.get(aa[i])!='':                 #检查必填字段
-                m=m+1                                    #用于验证必填
+            if aa[i] in request_body:
+                if request_body.get(aa[i])==None or request_body.get(aa[i])!='':                 #检查必填字段
+                    m=m+1                                    #用于验证必填
+                else:
+                    str = str + aa[i] + ','  # 错误信息提示
             else:
                 str=str+aa[i]+','                       #错误信息提示
+        print(m)
         if m==len(aa):
             res=dict(code=ResponseCode.SUCCESS,
-                     msg='必填项验证成功',
-                     payload=dict
-                     )
+                         msg='必填项验证成功',
+                         payload=dict
+                         )
         else:
             res = dict(code=ResponseCode.FAIL,
-                       msg='参数%s未填'%str)
+                           msg='参数%s未填'%str)
     else:
         res=dict(code=ResponseCode.FAIL,
-                       msg='必填项未填')
+                           msg='必填项未填')
 
     return res
 
@@ -118,3 +122,24 @@ def get_date(days,n):
         data=datetime.now() - timedelta(days=days)
     return data
 
+def insert_sql1(list1,request_body):        ####非必填项sql拼写#######
+    list2 = []
+    list3 = []
+    tmp1=""
+    tmp2=""
+    for i in list1:
+        if i in request_body:
+            if request_body.get(i) == '' or request_body.get(i) == None:
+                continue
+            else:
+                list2.append(i)
+                list3.append(request_body.get(i))
+    for i in range(0,len(list2)):
+        if i ==0:
+            tmp1=list2[i]
+            tmp2="'{0}'".format(list3[i])
+
+        else:
+            tmp1=tmp1+','+list2[i]
+            tmp2=tmp2+','+"'{0}'".format(list3[i])
+    return tmp1,tmp2
