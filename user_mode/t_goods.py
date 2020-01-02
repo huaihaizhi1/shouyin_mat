@@ -67,6 +67,7 @@ def t_goods(request_body,path):
                                                                                             seling_price,min_num,unit,status,date,date,list3)
         print(insert_sql)
         mysql.insert(insert_sql)
+        #####插入流水表未完成####
         res = dict(code=ResponseCode.SUCCESS,
                    msg='新增成功',
                    payload=None)
