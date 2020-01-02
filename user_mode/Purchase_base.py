@@ -5,7 +5,7 @@ from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
 from user_mode.public import *
-import json
+from user_mode.api_param import api_param
 
 
 
@@ -62,8 +62,8 @@ def purchase_goods(request_body,path):
         mysql=PymysqlPool()
         ########必填项#########
         shop_id = request_body.get('id')
-        purchase_date = request_body.get('purchase_date')
-        purchas_price = request_body.get('purchas_price')
+        purchase_date = date_s_date(request_body.get('purchase_date'))
+        purchase_price = request_body.get('purchase_price')
         user_id = request_body.get('id')
         user_name = request_body.get('user_name')
         price_status = request_body.get('price_status')
@@ -73,10 +73,10 @@ def purchase_goods(request_body,path):
         select_sql="select max(code_id) as code_id from t_purchase_table where shop_id={0}".format(shop_id)
         res111=mysql.getAll(select_sql)
         if res111[0]['code_id']==None:
-            code_id = user_id+'_10001'
+            code_id = str(user_id)+'_10001'
         else:
             tmp_id=str(int(res111[0]['code_id'].split('_')[1])+1)
-            code_id=user_id+'_'+tmp_id
+            code_id=str(user_id)+'_'+tmp_id
         print(code_id)
         purchase_no=request_body.get('purchase_no')
         if purchase_no=='' or purchase_no==None:
@@ -88,9 +88,9 @@ def purchase_goods(request_body,path):
         if suppiler_no==''or suppiler_no==None:
             suppiler_no = '-1'
         remarks=request_body.get('remarks')
-        insert_sql="insert into t_purchase_table(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchas_price,status," \
+        insert_sql="insert into t_purchase_table(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,status," \
                    "user_id,user_name,remarks,price_status) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')" \
-                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchas_price,'0',user_id,user_name,remarks,price_status)
+                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status)
         print(insert_sql)
         mysql.insert(insert_sql)
         ########货单流水记录##########
@@ -112,32 +112,57 @@ def purchase_goods(request_body,path):
         else:
             #####商品插入流程##############
             print(payload)
-            new_s = payload.replace('cnt_"r0x_ratio"', '"cnt_r0x_ratio"')
-            ls = eval(new_s)
-            for i in range(0,len(ls)):
-                shop_id=ls[i]['shop_id']
+            #new_s = payload.replace('cnt_"r0x_ratio"', '"cnt_r0x_ratio"')
+            #ls = eval(new_s)
+            aa = api_param.insert_goods
+            aa1 = aa['mast_info'].split(',')  # 逗号分隔必填项列表
+            aa1.remove('id')
+            aa1.remove('status')
+            print(aa1)
+            shop_id = request_body.get('id')
+            print(shop_id)
+            select_1="select max(goods_id) as goods_id from t_goods where shop_id='{0}'".format(shop_id)
+            res111 = mysql.getAll(select_1)
+            print(res111)
+            if res111[0]['goods_id'] == '' or res111[0]['goods_id']==None:
+                goods_id = '10000'
+            else:
+                goods_id = str(int(res111[0]['goods_id'].split('_')[1]))
+            print(goods_id)
+            for i in range(0,len(payload)):
+                keys = list(payload[i].keys())
+                for j in aa1:
+                    if j not in keys:
+                        res = dict(code=ResponseCode.FAIL,
+                                   msg='第{0}行参数{1}必填项未填'.format(i,j),
+                                   payload=None
+                                   )
+                        return res
+                goods_id=int(goods_id)+1
                 code_id=code_id
-                s_code=ls[i]['s_code']
-                u_code=ls[i]['u_code']
-                s_link=ls[i]['s_link']
-                s_photo=ls[i]['s_photo']
-                name=ls[i]['name']
-                inventory_quantity=ls[i]['inventory_quantity']
-                min_num=ls[i]['min_num']
-                seling_price=ls[i]['seling_price']
-                type_id=ls[i]['type_id']
-                unit_pinlei=ls[i]['unit_pinlei']
-                unit=ls[i]['unit']
-                threshold_remind=ls[i]['threshold_remind']
+                s_code=payload[i].get('s_code','')
+                u_code=payload[i].get('u_code','')
+                s_link=payload[i].get('s_link','')
+                s_photo=payload[i].get('s_photo','')
+                name=payload[i].get('name','')
+                inventory_quantity=payload[i].get('inventory_quantity','')
+                min_num=payload[i].get('min_num','')
+                seling_price=payload[i].get('seling_price','')
+                type_id=payload[i].get('type_id','')
+                unit_pinlei=payload[i].get('unit_pinlei','')
+                unit=payload[i].get('unit','')
+                threshold_remind=payload[i].get('threshold_remind','')
+                status=payload[i].get('status','0')
                 ####货单商品新增######
+                date = get_date(0, 1)
                 insert_sql="insert into t_goods(shop_id,code_id,s_code,u_code,s_link,s_photo,name," \
-                           "inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind,status) values('{0}','{1}'," \
-                           "'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')".format(
+                           "inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind,status,goods_id,create_time,update_time) values('{0}','{1}'," \
+                           "'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{0}_{15}','{16}','{17}')".format(
                     shop_id,code_id,s_code,u_code,s_link,s_photo,name,inventory_quantity,min_num,seling_price,type_id
-                    ,unit_pinlei,unit,threshold_remind,'0')
+                    ,unit_pinlei,unit,threshold_remind,status,goods_id,date,date)
                 mysql.insert(insert_sql)
-                ####货单商品流水新增#####
-                ####查看直接查询流水表####
+                ####查看直接查询流水表#未完成###
+                insert_sql111="insert into "
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，成功添加商品',
@@ -152,7 +177,7 @@ def purchase_goods(request_body,path):
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
-        select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_2="select id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         m1=mysql.getAll(select_sql_1)
@@ -172,7 +197,7 @@ def purchase_goods(request_body,path):
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
-        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_2="select id as proc_id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         #select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         resluts=mysql.getAll(select_sql_2+limit)
@@ -197,7 +222,7 @@ def purchase_goods(request_body,path):
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
-        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchas_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         #select_sql_2="select id as proc_id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         resluts=mysql.getAll(select_sql_3+limit)
@@ -220,16 +245,16 @@ def purchase_goods(request_body,path):
         shop_id=request_body.get('id')
         code_id=request_body.get('code_id')
         status=request_body.get('status')
-        purchas_price=request_body.get('purchas_price')
+        purchase_price=request_body.get('purchase_price')
         price_status=request_body.get('price_status')
         user_name=request_body.get('user_name')
         remarks=request_body.get('remarks')
         ######查询修改参数记录流水############
-        select_sql="select status,purchas_price,price_status from t_purchase_table where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
+        select_sql="select status,purchase_price,price_status from t_purchase_table where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
         print(mysql.getAll(select_sql))
         rrr=mysql.getAll(select_sql)
-        update_purchase_sql="update t_purchase_table set status='{0}',purchas_price='{1}',price_status='{2}'  where shop_id='{3}' and code_id='{4}'".format(
-            status,purchas_price,price_status,shop_id,code_id)
+        update_purchase_sql="update t_purchase_table set status='{0}',purchase_price='{1}',price_status='{2}'  where shop_id='{3}' and code_id='{4}'".format(
+            status,purchase_price,price_status,shop_id,code_id)
         mysql.update(update_purchase_sql)
         if str(status)!=str(rrr[0]['status']) and str(rrr[0]['status'])=='0':
             #####货单流水修改####
@@ -239,9 +264,9 @@ def purchase_goods(request_body,path):
             ########作废后商品数据修改#######
             insert_sql1="update t_goods set status=1 where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
             mysql.insert(insert_sql1)
-        if str(purchas_price)!=str(rrr[0]['purchas_price']):
+        if str(purchase_price)!=str(rrr[0]['purchase_price']):
             ########商品金额修改
-            mt='金额由{0}修改为{1}'.format(rrr[0]['purchas_price'],purchas_price)
+            mt='金额由{0}修改为{1}'.format(rrr[0]['purchase_price'],purchase_price)
             insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
                        "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,mt,remarks)
             mysql.insert(insert_sql)

@@ -266,8 +266,11 @@ def select_purchase():
 
 @server.route('/create_purchase',methods=["POST","GET"])           ####查看货单列表########
 def create_purchase():
+    if request.method=='POST':
+        request_body = request.get_json(force=True)  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
     dict1 = api_param.create_purchase  # 获取接口参数必填项与参数列表(需要修改)
-    request_body = request.form  # 获取接口表单参数
     path=request.path
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200

@@ -1,6 +1,8 @@
 from code1 import *
 from datetime import datetime, date
 from datetime import timedelta
+import dateutil.parser
+
 ##############################必填项检查#########################
 def Required_verification(request_body,dict1):       ###必填项检查
     if request_body:                                    #判断接口是否有参数
@@ -8,6 +10,8 @@ def Required_verification(request_body,dict1):       ###必填项检查
         aa=canshu['mast_info'].split(',')             #逗号分隔必填项列表
         m=0                                             #用于判断必填项是否都填了
         str=''                                          #用于错误信息提示
+        print('接口参数：{0}'.format(request_body))
+        print('必填项参数：{0}'.format(aa))
         for i in range(0,len(aa)):                      #循环判断必填项检查
             if aa[i] in request_body:
                 if request_body.get(aa[i])==None or request_body.get(aa[i])!='':                 #检查必填字段
@@ -143,3 +147,8 @@ def insert_sql1(list1,request_body):        ####非必填项sql拼写#######
             tmp1=tmp1+','+list2[i]
             tmp2=tmp2+','+"'{0}'".format(list3[i])
     return tmp1,tmp2
+
+
+def date_s_date(m1):        ###前端修改时间#######
+    d = dateutil.parser.parse(m1)
+    return d.strftime('%Y-%m-%d %H:%M:%S')
