@@ -144,7 +144,7 @@ def purchase_goods(request_body,path):
                 u_code=payload[i].get('u_code','')
                 s_link=payload[i].get('s_link','')
                 s_photo=payload[i].get('s_photo','')
-                name=payload[i].get('name','')
+                name=payload[i].get('name')
                 inventory_quantity=payload[i].get('inventory_quantity','')
                 min_num=payload[i].get('min_num','')
                 seling_price=payload[i].get('seling_price','')
@@ -161,8 +161,10 @@ def purchase_goods(request_body,path):
                     shop_id,code_id,s_code,u_code,s_link,s_photo,name,inventory_quantity,min_num,seling_price,type_id
                     ,unit_pinlei,unit,threshold_remind,status,goods_id,date,date)
                 mysql.insert(insert_sql)
-                ####查看直接查询流水表#未完成###
-                insert_sql111="insert into "
+                ####查看直接查询流水表t_goods_list####
+                insert_sql111="insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time) values('{1}_{0}','{1}'," \
+                              "'{2}','{3}','{4}','{5}','{6}','{7}','{8}')".format(goods_id,shop_id,code_id,name,unit,user_id,user_name,'进货',date)
+                mysql.insert(insert_sql111)
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，成功添加商品',

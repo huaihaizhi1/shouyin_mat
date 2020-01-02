@@ -65,4 +65,4 @@ class api_param(object):
     ######商品查看#########
     select_goods={'mast_info':'id,status'}
     ######商品写入########
-    insert_goods={'mast_info':'id,inventory_quantity,name,seling_price,min_num,unit,status'}
+    insert_goods={'mast_info':'id,inventory_quantity,name,seling_price,min_num,unit,status,user_name,user_id'}
