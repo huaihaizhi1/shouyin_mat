@@ -19,6 +19,7 @@ def login_user1(request_body):
             res=dict(code=ResponseCode.SUCCESS,
                         msg=ResponseMessage.SUCCESS,
                         payload=dict(id=resluts[0]['id'],
+                                     user_name=resluts[0]['user_name'],
                                      telnumber=resluts[0]['telnumber'])
                          )
             payload = dict(id=resluts[0]['id'],
