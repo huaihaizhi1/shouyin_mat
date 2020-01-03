@@ -35,9 +35,9 @@ def purchase_goods(request_body,path):
                 elif i=='end_price':
                     tmp_sql=" and purchase_price <={0}".format(request_body.get(i))
                 elif i=='start_date':
-                    tmp_sql=" and purchase_date >={0}".format(request_body.get(i))
+                    tmp_sql=" and purchase_date >={0}".format(date_s_date(request_body.get(i),'GMT','day'))
                 elif i=='end_date':
-                    tmp_sql=" and purchase_date <={0}".format(request_body.get(i))
+                    tmp_sql=" and purchase_date <={0}".format(date_s_date(request_body.get(i),'GMT','day'))
                 else:
                     tmp_sql = " and {0}='{1}' ".format(i, request_body.get(i))
                 tmp_sql1=tmp_sql1+tmp_sql
@@ -62,7 +62,7 @@ def purchase_goods(request_body,path):
         mysql=PymysqlPool()
         ########必填项#########
         shop_id = request_body.get('id')
-        purchase_date = date_s_date(request_body.get('purchase_date'))
+        purchase_date =date_s_date(request_body.get('purchase_date'), 'Z', 'day')
         purchase_price = request_body.get('purchase_price')
         user_id = request_body.get('id')
         user_name = request_body.get('user_name')
@@ -94,7 +94,7 @@ def purchase_goods(request_body,path):
         print(insert_sql)
         mysql.insert(insert_sql)
         ########货单流水记录##########
-        date = get_date(0, 1)
+        date = get_date(0, 2)
 
         insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
                          "'{4}')".format(shop_id, code_id, date, user_name, '创建')
@@ -118,6 +118,8 @@ def purchase_goods(request_body,path):
             aa1 = aa['mast_info'].split(',')  # 逗号分隔必填项列表
             aa1.remove('id')
             aa1.remove('status')
+            aa1.remove('user_name')
+            aa1.remove('user_id')
             print(aa1)
             shop_id = request_body.get('id')
             print(shop_id)

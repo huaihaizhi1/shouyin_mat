@@ -149,6 +149,22 @@ def insert_sql1(list1,request_body):        ####非必填项sql拼写#######
     return tmp1,tmp2
 
 
-def date_s_date(m1):        ###前端修改时间#######
-    d = dateutil.parser.parse(m1)
-    return d.strftime('%Y-%m-%d %H:%M:%S')
+def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT','day')
+    if param=='Z':
+        if n=='day':
+            d = dateutil.parser.parse(m1)
+            current_time = (d + datetime.timedelta(hours=8)).strftime('%Y-%m-%d')
+        else:
+            d = dateutil.parser.parse(m1)
+            current_time = (d + datetime.timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    elif param=='GMT':
+        if n=='day':
+            dd = m1
+            GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
+            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d')
+        else:
+            dd = m1
+            GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
+            current_time=datetime.datetime.strptime(dd, GMT_FORMAT)
+
+    return current_time

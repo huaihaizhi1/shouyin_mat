@@ -33,9 +33,9 @@ def t_goods(request_body,path):
                 elif i=='name':
                     tmp_sql=" and (name like '%{0}%' or code_id like '%{0}%' or s_code like '%{0}%') ".format(request_body.get(i))
                 elif i=='start_seling_price':
-                    tmp_sql=" and seling_price >='{0}'".format(request_body.get(i))
+                    tmp_sql=" and seling_price >='{0}'".format(date_s_date(request_body.get(i),'GMT','day'))
                 elif i=='end_seling_price':
-                    tmp_sql=" and seling_price <='{0}'".format(request_body.get(i))
+                    tmp_sql=" and seling_price <='{0}'".format(date_s_date(request_body.get(i),'GMT','day'))
                 tmp_sql1=tmp_sql1+tmp_sql
         select_sql1=select_sql+tmp_sql1+limit
         select_sql3="select count(*)  as total from t_goods where shop_id='{0}' and status='{1}' " \
@@ -88,6 +88,8 @@ def t_goods(request_body,path):
         res = dict(code=ResponseCode.SUCCESS,
                    msg='新增成功',
                    payload=None)
+    if path=='/update_goods':
+        select1="select id,goods_id,shop_id,name,"
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
