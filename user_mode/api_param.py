@@ -68,5 +68,9 @@ class api_param(object):
     insert_goods={'mast_info':'id,inventory_quantity,name,seling_price,min_num,unit,status,user_name,user_id'}
     ######商品修改########
     update_goods={'mast_info':'id,goods_id,name,inventory_quantity,min_num,seling_price,user_name,user_id'}
-    ######商品修改########
-    insert_vipuser={'mast_info':'id,vip_name,vip_tel_no'}
+    ######会员新增########
+    insert_vipuser={'mast_info':'id,vip_name,vip_tel_no,birthday'}
+    ######会员查看########
+    select_vipuser={'mast_info':'id'}
+    ######会员查看########
+    update_vipuser={'mast_info':'id,vip_id,vip_name,vip_tel_no'}
