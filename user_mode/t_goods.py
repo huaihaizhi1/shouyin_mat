@@ -5,7 +5,7 @@ from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
 from user_mode.public import *
-import json
+import re
 
 
 
@@ -89,7 +89,58 @@ def t_goods(request_body,path):
                    msg='新增成功',
                    payload=None)
     if path=='/update_goods':
-        select1="select id,goods_id,shop_id,name,"
+        shop_id=request_body.get('id')
+        user_id=request_body.get('user_id')
+        user_name=request_body.get('user_name')
+        goods_id=request_body.get('goods_id')
+        name=request_body.get('name')
+        inventory_quantity=request_body.get('inventory_quantity','')
+        min_num=request_body.get('min_num','')
+        seling_price=request_body.get('seling_price','')
+        type_id=request_body.get('type_id','')
+        unit_pinlei=request_body.get('unit_pinlei','')
+        unit=request_body.get('unit','')
+        threshold_remind=request_body.get('threshold_remind','')
+        code_id=request_body.get('code_id','')
+        date=get_date(0,2)
+        select1="select id,goods_id,shop_id,name,inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind from t_goods where goods_id='{0}'".format(goods_id)
+        mm1=mysql.getAll(select1)
+        keys = list(mm1[0].keys())
+        keys.remove('id')
+        keys.remove('shop_id')
+        keys.remove('goods_id')
+        print(keys)
+        for i in range(0,len(keys)):
+            mx=mm1[0].get(keys[i])
+            mx1=request_body.get(keys[i])
+            if mx1==None:
+                continue
+            else:
+                if mx!=mx1:
+                    if keys[i]=='inventory_quantity':
+                        insert1="insert into t_goods_inventory_flow(shop_id,code_id,goods_id,inventory_begin,inventory_after,inventory_list,create_time) values(" \
+                                "'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(shop_id,code_id,goods_id,mx,mx1,int(mx1)-int(mx),date)
+                    else:
+                        Operation_type='将{0}由{1}修改成{2}'.format(keys[i],mx,mx1)
+                        Operation_type=re.sub('name','商品名称：',Operation_type)
+                        Operation_type=re.sub('min_num','库存下线：',Operation_type)
+                        Operation_type=re.sub('seling_price','销售价格：',Operation_type)
+                        Operation_type=re.sub('type_id','商品分类：',Operation_type)
+                        Operation_type=re.sub('unit_pinlei','商品品类：',Operation_type)
+                        Operation_type=re.sub('unit','商品单位：',Operation_type)
+                        Operation_type=re.sub('threshold_remind','阀值提醒：',Operation_type)
+                        insert1="insert into t_goods_update_table(goods_id,shop_id,code_id,create_time,user_name,Operation_type,name) values(" \
+                            "'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(goods_id,shop_id,code_id,date,user_name,Operation_type,name)
+                    print(insert1)
+                    mysql.insert(insert1)
+        update_sql="update t_goods set name='{0}',inventory_quantity='{1}',min_num='{2}',seling_price='{3}',type_id='{4}',unit_pinlei='{5}'," \
+                   "unit='{6}',threshold_remind='{7}' where goods_id='{8}' ".format(name,inventory_quantity,min_num,seling_price,type_id,unit_pinlei,
+                                                                                    unit,threshold_remind,goods_id )
+        print(update_sql)
+        mysql.update(update_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='修改成功',
+                   payload=None)
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

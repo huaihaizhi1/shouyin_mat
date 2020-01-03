@@ -45,15 +45,15 @@ def purchase_goods(request_body,path):
         select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
         select_sql=select_sql+tmp_sql1
         select_sql=select_sql+limit
-        print(select_sql)
         mysql = PymysqlPool()
         print(select_sql)
         resluts=mysql.getAll(select_sql)
-        total_sql=len(resluts)
+        total_sql="select count(*) total  from t_purchase_table where shop_id='{0}'".format(shop_id)
+        total_sql=total_sql+tmp_sql1
         res = dict(code=ResponseCode.SUCCESS,
                        msg='查询成功',
                    payload=dict(page=start,
-                                total=total_sql,
+                                total=mysql.getAll(total_sql)[0]['total'],
                                 pageSize=stop,
                                 pageData=resluts,
                                 key='proc_id'))
@@ -62,6 +62,8 @@ def purchase_goods(request_body,path):
         mysql=PymysqlPool()
         ########必填项#########
         shop_id = request_body.get('id')
+        print(request_body.get('purchase_date'))
+        print(type(request_body.get('purchase_date')))
         purchase_date =date_s_date(request_body.get('purchase_date'), 'Z', 'day')
         purchase_price = request_body.get('purchase_price')
         user_id = request_body.get('id')

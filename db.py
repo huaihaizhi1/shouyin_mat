@@ -112,10 +112,15 @@ class PymysqlPool(BasePymysqlPool):
         return count
 
     def __query(self, sql, param=None):
-        if param is None:
-            count = self._cursor.execute(sql)
-        else:
-            count = self._cursor.execute(sql, param)
+        try:
+            if param is None:
+                count = self._cursor.execute(sql)
+            else:
+                count = self._cursor.execute(sql, param)
+        except:
+            self._conn.rollback()
+            self._cursor.close()
+            self._conn.close()
         return count
 
     def update(self, sql, param=None):

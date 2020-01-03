@@ -1,6 +1,6 @@
 from code1 import *
-from datetime import datetime, date
 from datetime import timedelta
+import datetime
 import dateutil.parser
 
 ##############################必填项检查#########################
@@ -119,11 +119,11 @@ def test_verify_captcha(request_body,scode):
 def get_date(days,n):
     # 格式化为 年月日 形式 2019-02-25
     if n==1:
-        data=(date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+        data=(datetime.date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
     else:
 
     # 格式化为 年月日时分秒 形式 2019-02-25 10:56:58.609985
-        data=datetime.now() - timedelta(days=days)
+        data=(datetime.datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
     return data
 
 def insert_sql1(list1,request_body):        ####非必填项sql拼写#######
