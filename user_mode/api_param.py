@@ -53,7 +53,7 @@ class api_param(object):
     select_purchase_pro={'mast_info':'id,code_id'}
 
     #####货单修改#####
-    update_purchase={'mast_info':'id,code_id,status,purchas_price,price_status,user_name'}
+    update_purchase={'mast_info':'id,code_id,status,purchase_price,price_status,user_name'}
     ##########供应商查看####
     select_supplier={'mast_info':'id'}
     #######供应商修改#######

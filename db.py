@@ -117,7 +117,7 @@ class PymysqlPool(BasePymysqlPool):
                 count = self._cursor.execute(sql)
             else:
                 count = self._cursor.execute(sql, param)
-        except:
+        except IOError:
             self._conn.rollback()
             self._cursor.close()
             self._conn.close()

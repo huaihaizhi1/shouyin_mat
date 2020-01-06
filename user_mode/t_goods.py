@@ -14,9 +14,13 @@ def t_goods(request_body,path):
     mysql=PymysqlPool()
     shop_id=request_body.get('id')
     if path=='/select_goods':
-        page = request_body.get('page')
         status = request_body.get('status')
-        pageSize = request_body.get('pageSize')
+        page = request_body.get('page',None)
+        pageSize = request_body.get('pageSize',None)
+        if page=='' or page==None:
+            page='1'
+        if pageSize=='' or pageSize==None:
+            pageSize='999999999999'
         start=int(int(page)-1)*int(pageSize)
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)

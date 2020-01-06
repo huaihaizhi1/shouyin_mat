@@ -21,5 +21,6 @@ def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT')
 
     return current_time
 
+
 print(date_s_date('2020-01-02T16:00:00.000Z','Z','day'))
 print(date_s_date('Fri Jan 03 2020 23:59:59 GMT+0800','GMT','day'))
