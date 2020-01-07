@@ -365,11 +365,16 @@ def supplier_api(request_body,path):
         shop_id=request_body.get('id')
         delete_sql="update t_supplier set status='1' where id='{0}' and shop_id='{1}'".format(proc_id,shop_id)
         print(delete_sql)
-        mysql.update(delete_sql)
-        res = dict(code=ResponseCode.SUCCESS,
-                   msg='删除成功',
-                   payload=None
+        if mysql.update(delete_sql)==False:
+            res=dict(code=ResponseCode.FAIL,
+                   msg='sqlcuowu',
+                   payload=delete_sql
                    )
+        else:
+            res = dict(code=ResponseCode.SUCCESS,
+                       msg='删除成功',
+                       payload=None
+                       )
     if path=='/insert_supplier':
         shop_id=request_body.get('id')
         name=request_body.get('name')

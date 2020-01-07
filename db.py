@@ -108,7 +108,12 @@ class PymysqlPool(BasePymysqlPool):
         @param values:要插入的记录数据tuple(tuple)/list[list]
         @return: count 受影响的行数
         """
-        count = self._cursor.executemany(sql, values)
+        try:
+            count = self._cursor.executemany(sql, values)
+        except :
+            self._conn.rollback()
+            self._cursor.close()
+            count=False
         return count
 
     def __query(self, sql, param=None):
@@ -117,10 +122,10 @@ class PymysqlPool(BasePymysqlPool):
                 count = self._cursor.execute(sql)
             else:
                 count = self._cursor.execute(sql, param)
-        except IOError:
+        except :
             self._conn.rollback()
             self._cursor.close()
-            self._conn.close()
+            count=False
         return count
 
     def update(self, sql, param=None):

@@ -17,14 +17,13 @@ def t_goods(request_body,path):
         status = request_body.get('status')
         page = request_body.get('page',None)
         pageSize = request_body.get('pageSize',None)
-        if page=='' or page==None:
+        if page=='' or page==None or pageSize=='' or pageSize==None:
             page='1'
-        if pageSize=='' or pageSize==None:
-            pageSize='999999999999'
+            pageSize = '999999999999'
         start=int(int(page)-1)*int(pageSize)
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)
-        select_sql="select goods_id,name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}' and status='{1}' " \
+        select_sql="select code_id,shop_id,u_code_id,goods_id,name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}' and status='{1}' " \
                    "".format(shop_id,status)
         list1=['name','start_seling_price','end_seling_price','inventory_quantity']
         tmp_sql1=""
@@ -35,7 +34,7 @@ def t_goods(request_body,path):
                 if request_body.get(i)=='' or request_body.get(i)==None:
                     continue
                 elif i=='name':
-                    tmp_sql=" and (name like '%{0}%' or code_id like '%{0}%' or s_code like '%{0}%') ".format(request_body.get(i))
+                    tmp_sql=" and (name like '%{0}%' or code_id like '%{0}%' or s_code like '%{0}% or goods_id like '%{0}%') ".format(request_body.get(i))
                 elif i=='start_seling_price':
                     tmp_sql=" and seling_price >='{0}'".format(date_s_date(request_body.get(i),'GMT','day'))
                 elif i=='end_seling_price':

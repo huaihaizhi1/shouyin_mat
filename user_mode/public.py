@@ -14,7 +14,7 @@ def Required_verification(request_body,dict1):       ###必填项检查
         print('必填项参数：{0}'.format(aa))
         for i in range(0,len(aa)):                      #循环判断必填项检查
             if aa[i] in request_body:
-                if request_body.get(aa[i])==None or request_body.get(aa[i])!='':                 #检查必填字段
+                if request_body.get(aa[i])!=None: #or request_body.get(aa[i])!='':                 #检查必填字段
                     m=m+1                                    #用于验证必填
                 else:
                     str = str + aa[i] + ','  # 错误信息提示

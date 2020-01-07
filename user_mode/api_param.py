@@ -57,11 +57,11 @@ class api_param(object):
     ##########供应商查看####
     select_supplier={'mast_info':'id'}
     #######供应商修改#######
-    update_supplier={'mast_info':'id,name,number,address,contact,proc_id'}
+    update_supplier={'mast_info':'id,name,number,address,proc_id'}
     ######供应商删除########
     delete_supplier={'mast_info':'id,proc_id'}
     ######供应商添加########
-    insert_supplier={'mast_info':'id,name,number,address,contact'}
+    insert_supplier={'mast_info':'id,name'}
     ######商品查看#########
     select_goods={'mast_info':'id,status'}
     ######商品写入########
@@ -72,5 +72,7 @@ class api_param(object):
     insert_vipuser={'mast_info':'id,vip_name,vip_tel_no,birthday'}
     ######会员查看########
     select_vipuser={'mast_info':'id'}
-    ######会员查看########
+    ######会员修改########
     update_vipuser={'mast_info':'id,vip_id,vip_name,vip_tel_no'}
+    ######销售下单########
+    insert_order={'mast_info':'id,pur_sal,pur_num,sal,payload,status,pay_type'}
