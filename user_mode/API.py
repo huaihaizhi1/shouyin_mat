@@ -499,3 +499,33 @@ def insert_order():
     else:
         res = res1  # 接口返回不为200则提示错误系信息
     return res
+
+@server.route('/del_order',methods=["POST","GET"])           ####退货处理########
+def del_order():
+    if request.method=='POST':
+        request_body = request.json  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.del_order  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+@server.route('/select_order',methods=["POST","GET"])           ####订单查询########
+def select_order():
+    if request.method=='POST':
+        request_body = request.json  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.select_order  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
