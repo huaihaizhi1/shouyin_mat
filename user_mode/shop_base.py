@@ -87,8 +87,6 @@ def staff_user(request_body,path):                  #####导购员管理########
     id=request_body.get('id')
     staff_id=request_body.get('staff_id',None)
     staff_name=request_body.get('staff_name',None)
-    page=request_body.get('page')
-    pageSize=request_body.get('pageSize')
     select_sql = 'select id as proc_id,staff_id,staff_name,create_time from staff_user_table where shop_id="{0}" and status="{1}" '.format(id,'0')
     insert_sql = "insert into staff_user_table(shop_id,staff_id,staff_name,status,create_time,update_time) " \
                  "values ('{0}','{1}','{2}','0','{3}','{4}')" \
@@ -130,7 +128,19 @@ def staff_user(request_body,path):                  #####导购员管理########
                        )
     if path=='/select_employess':
         mysql = PymysqlPool()
+        select_sql = 'select id as proc_id,staff_id,staff_name,create_time from staff_user_table where shop_id="{0}" and status="{1}" '.format(
+            id, '0')
         print(select_sql)
+        page = request_body.get('page')
+        pageSize = request_body.get('pageSize')
+        if page=='' or pageSize =='' or page==None or pageSize ==None:
+            page=1
+            pageSize=999999999
+        name = request_body.get('name')
+        if name!='' and name!=None:
+            select_sql = "select id as proc_id,staff_id,staff_name,create_time from staff_user_table where shop_id='{0}' and status='{1}'  and " \
+                         "(staff_id like '%{2}%' or staff_name like '%{2}%')".format(
+                id, '0',name)
         resluts = mysql.getAll(select_sql)
         start = int(int(page) - 1) * int(pageSize)
         stop = pageSize

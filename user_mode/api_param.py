@@ -34,7 +34,7 @@ class api_param(object):
     #######员工修改#####
     update_employess={'mast_info': 'id,staff_id,staff_name','info':'id,shop_id,staff_id,staff_name'}
     #####员工信息######
-    staff_info={'mast_info': 'id,page,pageSize','info':'id,shop_id,staff_id,staff_name'}
+    staff_info={'mast_info': 'id','info':'id,shop_id,staff_id,staff_name'}
     #######员工删除#####
     delete_employess={'mast_info': 'id,staff_id','info':'id,shop_id,staff_id,staff_name'}
     #######商品分类查看####

@@ -46,7 +46,7 @@ def vip_user(request_body, path):
                 if request_body.get(i) == '' or request_body.get(i) == None:
                     continue
                 elif i == 'vip_name':
-                    tmp_sql = " and vip_name like '%{0}%'".format(request_body.get(i))
+                    tmp_sql = " and (vip_name like '%{0}%' or vip_tel_no '%{0}%')  ".format(request_body.get(i))
                 elif i == 'page':
                     page = request_body.get('page')
                     pageSize = request_body.get('pageSize')
