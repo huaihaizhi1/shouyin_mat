@@ -47,6 +47,11 @@ def t_order(request_body,path):
         print(insert_order_sql)
         res1111=mysql.insert(insert_order_sql)
         print(res1111)
+        #######积分增加#######
+        if vip_id!='' or vip_id!=None:
+            ins_vip_code="update vip_table set code=code=IFNULL(0,code)+{0} where vip_id='{1}'".format(sal,vip_id)
+            print(ins_vip_code)
+            mysql.update(ins_vip_code)
         ########订单详情入库##
         print(payload)
         df=pd.DataFrame(payload)
@@ -122,7 +127,6 @@ def t_order(request_body,path):
         sal = request_body.get('sal')
         pay_type = request_body.get('pay_type')
         payload = request_body.get('payload')
-        staff_id = request_body.get('staff_id')
         staff_name = request_body.get('staff_name')
         date=get_date(0,2)
         selet_get_purno_sql="select max(pur_no) as pur_no from order_master where shop_id='{0}'".format(shop_id)
@@ -141,6 +145,11 @@ def t_order(request_body,path):
         print(ins_order_mast)
         res1111 = mysql.insert(ins_order_mast)
         print(res1111)
+        #######积分扣减#######
+        if vip_id!='' or vip_id!=None:
+            ins_vip_code="update vip_table set code=code=IFNULL(0,code)-{0} where vip_id='{1}'".format(sal,vip_id)
+            print(ins_vip_code)
+            mysql.update(ins_vip_code)
         ########订单详情入库##
         print(payload)
         df = pd.DataFrame(payload)
@@ -188,6 +197,9 @@ def t_order(request_body,path):
                 print(update_t_goods_sql)
                 mysql.insert(insert_goods_list)  ###流水入库##
                 mysql.update(update_t_goods_sql)  ###库存处理
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='数据处理成功',
+                   payload=None)
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

@@ -125,7 +125,7 @@ class PymysqlPool(BasePymysqlPool):
         except :
             self._conn.rollback()
             self._cursor.close()
-            count=False
+            print(sql)
         return count
 
     def update(self, sql, param=None):
