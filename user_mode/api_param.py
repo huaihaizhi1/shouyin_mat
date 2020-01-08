@@ -79,4 +79,4 @@ class api_param(object):
     ######订单查询########
     select_order={'mast_info':'id,pur_no'}
     ######退货处理########
-    select_order={'mast_info':'id,pur_no,staff_id,staff_name,pur_sal,pur_num,sal,payload,status,pay_type,pur_no'}
+    del_order={'mast_info':'id,pur_no,staff_id,staff_name,pur_sal,pur_num,sal,payload,status,pay_type,pur_no'}
