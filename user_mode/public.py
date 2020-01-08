@@ -162,9 +162,13 @@ def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT',
             dd = m1
             GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
             current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d')
+        elif n=='get':
+            dd = m1
+            GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT 0800'
+            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d %H:%M:%S')
         else:
             dd = m1
             GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
-            current_time=datetime.datetime.strptime(dd, GMT_FORMAT)
+            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d %H:%M:%S')
 
     return current_time

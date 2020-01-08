@@ -17,10 +17,10 @@ def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT')
         else:
             dd = m1
             GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
-            current_time=datetime.datetime.strptime(dd, GMT_FORMAT)
+            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d %H:%M:%S')
 
     return current_time
 
 
 print(date_s_date('2020-01-02T16:00:00.000Z','Z','day'))
-print(date_s_date('Fri Jan 03 2020 23:59:59 GMT+0800','GMT','day'))
+print(date_s_date('Thu Jan 23 2020 08:00:00 GMT+0800','GMT','1'))

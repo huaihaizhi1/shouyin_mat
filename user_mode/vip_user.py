@@ -36,7 +36,7 @@ def vip_user(request_body, path):
                    msg='创建成功',
                    payload=None)
     if path=='/select_vipuser':
-        shop_id=request_body.get('id','')
+        shop_id=request_body.get('id')
         list1 = ['vip_name', 'page']
         tmp_sql1 = ""
         limit = ''
@@ -46,7 +46,7 @@ def vip_user(request_body, path):
                 if request_body.get(i) == '' or request_body.get(i) == None:
                     continue
                 elif i == 'vip_name':
-                    tmp_sql = " and (vip_name like '%{0}%' or vip_tel_no '%{0}%')  ".format(request_body.get(i))
+                    tmp_sql = " and (vip_name like '%{0}%' or vip_tel_no like '%{0}%')  ".format(request_body.get(i))
                 elif i == 'page':
                     page = request_body.get('page')
                     pageSize = request_body.get('pageSize')
@@ -85,10 +85,13 @@ def vip_user(request_body, path):
         vip_grade=request_body.get('vip_grade','')
         birthday=date_s_date(request_body.get('birthday',''),'GMT','day')
         remark=request_body.get('remark','')
-        update_sql="update vip_table set vip_name='{0}',vip_tel_no='{1}',sex='{2}',vip_grade='{3}',birthday='{4}'，remark='{5}'" \
+        update_sql="update vip_table set vip_name='{0}',vip_tel_no='{1}',sex='{2}',vip_grade='{3}',birthday='{4}',remark='{5}'" \
                    " where shop_id='{6}' and vip_id='{7}'".format(vip_name,vip_tel_no,sex,vip_grade,birthday,remark,shop_id,vip_id)
         print(update_sql)
         mysql.update(update_sql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='修改成功',
+                   payload=None)
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

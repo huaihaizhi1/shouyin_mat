@@ -1,18 +1,22 @@
 from user_mode.login import *
 from user_mode.vip_user import *
 from user_mode.shop_base import *
+from user_mode.BI import *
 from user_mode.t_order import *
 from user_mode.api_param import api_param
 from flask import Flask, session, request
 import os
 from user_mode.Purchase_base import *
 from user_mode.t_goods import *
+from user_mode.api_param import MyJSONEncoder
 
 
 
 server=Flask(__name__)
 server.config['JSON_AS_ASCII'] = False
 server.config['SECRET_KEY'] = os.urandom(24)
+server.json_encoder = MyJSONEncoder
+
 # @server.before_request#执行所有装饰器都要执行当前装饰器(简洁版实现同样功能)
 # def login_required():
 #     if request.path in ['/create_user','/forget_user','/testGetCaptcha','/login_user']: #如果登录的路由是注册和登录就返会none
@@ -485,7 +489,7 @@ def update_vipuser():
     return res
 
 
-@server.route('/insert_order',methods=["POST","GET"])           ####新增供应商########
+@server.route('/insert_order',methods=["POST","GET"])           ####销售下单########
 def insert_order():
     if request.method=='POST':
         request_body = request.json  # 获取接口表单参数
@@ -518,7 +522,7 @@ def del_order():
 @server.route('/select_order',methods=["POST","GET"])           ####订单查询########
 def select_order():
     if request.method=='POST':
-        request_body = request.json  # 获取接口表单参数
+        request_body = request.form  # 获取接口表单参数
     elif request.method=='GET':
         request_body = request.args
     dict1 = api_param.select_order  # 获取接口参数必填项与参数列表(需要修改)
@@ -526,6 +530,55 @@ def select_order():
     res1 = Required_verification(request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+
+@server.route('/bi_Business_analysis',methods=["POST","GET"])           ####经营分析########
+def bi_Business_analysis():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.bi_Business_analysis  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    print(request_body)
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+@server.route('/bi_Business_sum',methods=["POST","GET"])           ####营销额查询########
+def bi_Business_sum():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.bi_Business_sum  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    print(request_body)
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+@server.route('/bi_Business_goods',methods=["POST","GET"])           ####商品销售排行########
+def bi_Business_goods():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.bi_Business_goods  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    print(request_body)
+    res1 = Required_verification(request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
         res = res1  # 接口返回不为200则提示错误系信息
     return res

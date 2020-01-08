@@ -1,4 +1,5 @@
-
+import decimal
+import flask.json
 class api_param(object):
     #######接口参数验证##########
     ######mastinfo是必填项#######
@@ -80,3 +81,18 @@ class api_param(object):
     select_order={'mast_info':'id,pur_no'}
     ######退货处理########
     del_order={'mast_info':'id,pur_no,staff_id,staff_name,pur_sal,pur_num,sal,payload,status,pay_type,pur_no'}
+    ######经营分析########
+    bi_Business_analysis={'mast_info':'id,start_date,end_date'}
+    ######销售查询########
+    bi_Business_sum={'mast_info':'id,start_date,end_date'}
+    ######商品销售排行########
+    bi_Business_goods={'mast_info':'id,start_date,end_date'}
+
+
+class MyJSONEncoder(flask.json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            # Convert decimal instances to strings.
+            return str(obj)
+        return super(MyJSONEncoder, self).default(obj)

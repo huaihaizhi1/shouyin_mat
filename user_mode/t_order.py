@@ -82,16 +82,16 @@ def t_order(request_body,path):
             return jsonify(res)
         else:
             for tmpdict in payload:
-                insert_goods_list="insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time,pur_no) values(" \
+                insert_goods_list="insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time,pur_no,status) values(" \
                                   "'{0}','{1}','{2}'," \
-                                  "'{3}','{4}','{5}','{6}','{7}','{8}','{9}')".format(tmpdict.get('goods_id'),
+                                  "'{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')".format(tmpdict.get('goods_id'),
                                                                                       tmpdict.get('shop_id'),
                                                                                       tmpdict.get('code_id'),
                                                                                       tmpdict.get('name'),
                                                                                       tmpdict.get('number'),
                                                                                       staff_id,
                                                                                       staff_name,'销售',
-                                                                                      date,pur_no
+                                                                                      date,pur_no,'0'
                                                                                       )
                 print(insert_goods_list)
                 update_t_goods_sql="update t_goods set inventory_quantity=inventory_quantity-{0} where goods_id='{1}'".format(tmpdict.get('number'),tmpdict.get('goods_id'))
@@ -180,16 +180,16 @@ def t_order(request_body,path):
             return jsonify(res)
         else:
             for tmpdict in payload:
-                insert_goods_list = "insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time,pur_no) values(" \
+                insert_goods_list = "insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time,pur_no,status) values(" \
                                     "'{0}','{1}','{2}'," \
-                                    "'{3}','{4}','{5}','{6}','{7}','{8}','{9}')".format(tmpdict.get('goods_id'),
+                                    "'{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')".format(tmpdict.get('goods_id'),
                                                                                         tmpdict.get('shop_id'),
                                                                                         tmpdict.get('code_id'),
                                                                                         tmpdict.get('name'),
                                                                                         tmpdict.get('number'),
                                                                                         staff_id,
                                                                                         staff_name, '退货',
-                                                                                        date, pur_no
+                                                                                        date, pur_no,'1'
                                                                                         )
                 print(insert_goods_list)
                 update_t_goods_sql = "update t_goods set inventory_quantity=inventory_quantity+{0} where goods_id='{1}'".format(

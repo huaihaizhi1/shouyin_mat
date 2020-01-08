@@ -94,14 +94,13 @@ def purchase_goods(request_body,path):
         if suppiler_no==''or suppiler_no==None:
             suppiler_no = '-1'
         remarks=request_body.get('remarks')
+        date=get_date(0,2)
         insert_sql="insert into t_purchase_table(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,status," \
-                   "user_id,user_name,remarks,price_status) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')" \
-                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status)
+                   "user_id,user_name,remarks,price_status,create_time) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}')" \
+                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status,date)
         print(insert_sql)
         mysql.insert(insert_sql)
         ########货单流水记录##########
-        date = get_date(0, 2)
-
         insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
                          "'{4}')".format(shop_id, code_id, date, user_name, '创建')
         insert_tmp1_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
@@ -209,7 +208,7 @@ def purchase_goods(request_body,path):
         limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
         #select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
-        select_sql_2="select id as proc_id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_2="select id as l,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         #select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         resluts=mysql.getAll(select_sql_2+limit)
         print(select_sql_2+limit)
@@ -316,7 +315,7 @@ def supplier_api(request_body,path):
                 if request_body.get(i)=='' or request_body.get(i)==None:
                     continue
                 elif i=='name':
-                    tmp_sql=" and name like '%{0}%'".format(request_body.get(i))
+                    tmp_sql=" and (name like '%{0}%' or contact like '%{0}%' or number like '%{0}%' )".format(request_body.get(i))
                 elif i=='page':
                     page = request_body.get('page')
                     pageSize = request_body.get('pageSize')
