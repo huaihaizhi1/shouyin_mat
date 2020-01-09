@@ -87,8 +87,16 @@ class api_param(object):
     bi_Business_sum={'mast_info':'id,start_date,end_date'}
     ######商品销售排行########
     bi_Business_goods={'mast_info':'id,start_date,end_date'}
-    ######商品销售排行########
-    bi_Business_goods_list={'mast_info':'id,goods_id,start_date,end_date'}
+    ######商品流水查看########
+    bi_Business_goods_list={'mast_info':'id,goods_id'}
+    ######未销售商品查询########
+    bi_Business_goods_1={'mast_info':'id,start_date,end_date'}
+    ######商品修改记录########
+    bi_goods_update_list1={'mast_info':'id,start_date,end_date'}
+    ######商品库存调整记录########
+    bi_goods_update_list2={'mast_info':'id,start_date,end_date'}
+    ######导购员业绩查询########
+    bi_staff_select={'mast_info':'id,start_date,end_date'}
 
 
 class MyJSONEncoder(flask.json.JSONEncoder):

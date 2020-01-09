@@ -23,7 +23,7 @@ def t_goods(request_body,path):
         start=int(int(page)-1)*int(pageSize)
         stop=pageSize
         limit=" order by id desc limit {0}, {1}".format(start,stop)
-        select_sql="select code_id,shop_id,u_code,goods_id,name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind from t_goods where shop_id='{0}' and status='{1}' " \
+        select_sql="select code_id,shop_id,u_code,goods_id,name,s_code,inventory_quantity,seling_price,unit_pinlei,unit,s_photo,min_num,threshold_remind,status from t_goods where shop_id='{0}' and status='{1}' " \
                    "".format(shop_id,status)
         list1=['name','start_seling_price','end_seling_price','inventory_quantity']
         tmp_sql1=""
@@ -53,7 +53,7 @@ def t_goods(request_body,path):
                                 total=total_sql,
                                 pageSize=stop,
                                 pageData=resluts,
-                                key='proc_id'))
+                                key='goods_id'))
     if path=='/insert_goods':
         print(request_body)
         shop_id = request_body.get('id')
@@ -75,12 +75,12 @@ def t_goods(request_body,path):
         if res111[0]['goods_id'] == '' or res111[0]['goods_id'] == None:
             goods_id = '10000'
         else:
-            goods_id = str(int(res111[0]['goods_id'].split('_')[1]))
+            goods_id = shop_id+'_'+str(int(res111[0]['goods_id'].split('_')[1])+1)
         print(goods_id)
         date=get_date(0,2)
-        insert_sql="insert into t_goods(goods_id,shop_id,name,inventory_quantity,seling_price,min_num,unit,status,create_time,update_time" \
-                   "{0}) values('{11}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}',{10})".format(list2,shop_id,name,inventory_quantity,
-                                                                                            seling_price,min_num,unit,status,date,date,list3),goods_id
+        insert_sql="insert into t_goods(goods_id,shop_id,name,inventory_quantity,seling_price,min_num,unit,status,create_time,update_time," \
+                   "{0}) values('{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',{11})".format(list2,goods_id,shop_id,name,inventory_quantity,
+                                                                                            seling_price,min_num,unit,status,date,date,list3)
         print(insert_sql)
         mysql.insert(insert_sql)
         #####插入流水表完成####
@@ -106,7 +106,8 @@ def t_goods(request_body,path):
         threshold_remind=request_body.get('threshold_remind','')
         code_id=request_body.get('code_id','')
         date=get_date(0,2)
-        select1="select id,goods_id,shop_id,name,inventory_quantity,min_num,seling_price,type_id,unit_pinlei,unit,threshold_remind from t_goods where goods_id='{0}'".format(goods_id)
+        select1="select id,goods_id,shop_id,name,inventory_quantity,min_num," \
+                "seling_price,type_id,unit_pinlei,unit,threshold_remind from t_goods where goods_id='{0}'".format(goods_id)
         mm1=mysql.getAll(select1)
         keys = list(mm1[0].keys())
         keys.remove('id')
@@ -121,8 +122,9 @@ def t_goods(request_body,path):
             else:
                 if mx!=mx1:
                     if keys[i]=='inventory_quantity':
-                        insert1="insert into t_goods_inventory_flow(shop_id,code_id,goods_id,inventory_begin,inventory_after,inventory_list,create_time) values(" \
-                                "'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(shop_id,code_id,goods_id,mx,mx1,int(mx1)-int(mx),date)
+                        insert1="insert into t_goods_inventory_flow(shop_id,code_id,goods_id,inventory_begin," \
+                                "inventory_after,inventory_list,create_time,name,user_id,user_name) values(" \
+                                "'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}')".format(shop_id,code_id,goods_id,mx,mx1,int(mx1)-int(mx),date,name,user_id,user_name)
                     else:
                         Operation_type='将{0}由{1}修改成{2}'.format(keys[i],mx,mx1)
                         Operation_type=re.sub('name','商品名称：',Operation_type)
