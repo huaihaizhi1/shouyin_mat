@@ -95,7 +95,7 @@ def Management(request_body,path):
                    payload=dict(
                                 pageData=resluts,
                                 key='date'))
-    if path == '/bi_Business_sum':
+    if path == '/bi_Business_goods':
         shop_id=request_body.get('id')
         start_date=date_s_date(request_body.get('start_date'),'GMT','get')
         end_date=date_s_date(request_body.get('end_date'),'GMT','get')
@@ -115,6 +115,8 @@ def Management(request_body,path):
                    payload=dict(
                                 pageData=resluts,
                                 key='date'))
+    if path == '/bi_Business_goods_list':
+        111
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

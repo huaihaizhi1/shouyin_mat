@@ -87,6 +87,8 @@ class api_param(object):
     bi_Business_sum={'mast_info':'id,start_date,end_date'}
     ######商品销售排行########
     bi_Business_goods={'mast_info':'id,start_date,end_date'}
+    ######商品销售排行########
+    bi_Business_goods_list={'mast_info':'id,goods_id,start_date,end_date'}
 
 
 class MyJSONEncoder(flask.json.JSONEncoder):
