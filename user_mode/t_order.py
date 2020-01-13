@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 from flask import Flask,sessions,request,make_response,jsonify
-import os
+import log
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
@@ -46,12 +46,27 @@ def t_order(request_body,path):
                          "'{5}','{6}','{7}','{8}','{9}','{10}')".format(shop_id,pur_no,staff_id,vip_id,pur_sal,pur_num,date,status,Discount_type,sal,pay_type)
         print(insert_order_sql)
         res1111=mysql.insert(insert_order_sql)
-        print(res1111)
+        if res1111==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,insert_order_sql)
+            log.LOG.error(msg)
+            return res
         #######积分增加#######
         if vip_id!='' or vip_id!=None:
             ins_vip_code="update vip_table set code=code=IFNULL(0,code)+{0} where vip_id='{1}'".format(sal,vip_id)
             print(ins_vip_code)
-            mysql.update(ins_vip_code)
+            m10=mysql.update(ins_vip_code)
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误,积分增加".format(path, insert_order_sql)
+                log.LOG.error(msg)
+                return res
         ########订单详情入库##
         print(payload)
         df=pd.DataFrame(payload)
@@ -96,8 +111,24 @@ def t_order(request_body,path):
                 print(insert_goods_list)
                 update_t_goods_sql="update t_goods set inventory_quantity=inventory_quantity-{0} where goods_id='{1}'".format(tmpdict.get('number'),tmpdict.get('goods_id'))
                 print(update_t_goods_sql)
-                mysql.insert(insert_goods_list) ###流水入库##
-                mysql.update(update_t_goods_sql)###库存处理
+                m1=mysql.insert(insert_goods_list) ###流水入库##
+                if m1 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,流水入库".format(path, insert_goods_list)
+                    log.LOG.error(msg)
+                    return res
+                m2=mysql.update(update_t_goods_sql)###库存处理
+                if m2 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,库存处理".format(path, update_t_goods_sql)
+                    log.LOG.error(msg)
+                    return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='数据处理成功',
                    payload=None)
@@ -144,12 +175,25 @@ def t_order(request_body,path):
         )
         print(ins_order_mast)
         res1111 = mysql.insert(ins_order_mast)
-        print(res1111)
-        #######积分扣减#######
+        if res1111==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,ins_order_mast)
+            log.LOG.error(msg)
+            return res        #######积分扣减#######
         if vip_id!='' or vip_id!=None:
             ins_vip_code="update vip_table set code=code=IFNULL(0,code)-{0} where vip_id='{1}'".format(sal,vip_id)
-            print(ins_vip_code)
-            mysql.update(ins_vip_code)
+            m2=mysql.update(ins_vip_code)
+            if m2 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, ins_vip_code)
+                log.LOG.error(msg)
+                return res
         ########订单详情入库##
         print(payload)
         df = pd.DataFrame(payload)
@@ -195,8 +239,24 @@ def t_order(request_body,path):
                 update_t_goods_sql = "update t_goods set inventory_quantity=inventory_quantity+{0} where goods_id='{1}'".format(
                     tmpdict.get('number'), tmpdict.get('goods_id'))
                 print(update_t_goods_sql)
-                mysql.insert(insert_goods_list)  ###流水入库##
-                mysql.update(update_t_goods_sql)  ###库存处理
+                m4=mysql.insert(insert_goods_list)  ###流水入库##
+                if m4 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误".format(path, insert_goods_list)
+                    log.LOG.error(msg)
+                    return res
+                m5=mysql.update(update_t_goods_sql)  ###库存处理
+                if m5 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误".format(path, update_t_goods_sql)
+                    log.LOG.error(msg)
+                    return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='数据处理成功',
                    payload=None)

@@ -3,7 +3,7 @@ import os
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
-import time
+import log
 
 
 def shop(request_body,path):                                ######店铺管理##########
@@ -49,7 +49,6 @@ def shop(request_body,path):                                ######店铺管理##
     if path=='/create_shop':
         print(request_body)
         resluts = mysql.getAll(select_sql)
-
         if resluts!=[]:                           #查看店铺是否存在
             res = dict(code=ResponseCode.SUCCESS,
                        msg='用户已创建',
@@ -57,7 +56,15 @@ def shop(request_body,path):                                ######店铺管理##
                        )
         else:
             print(insert_sql)
-            mysql.insert(insert_sql)                           #店铺创建
+            m10=mysql.insert(insert_sql)                           #店铺创建
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, insert_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload=None
@@ -65,7 +72,15 @@ def shop(request_body,path):                                ######店铺管理##
     if path=='/update_shop':
         resluts = mysql.getAll(select_sql)
         if resluts!=[]:                       #查看店铺是否存在
-            mysql.update(update_sql)                       #修改店铺信息
+            m10=mysql.update(update_sql)                       #修改店铺信息
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, update_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
                        payload=None
@@ -105,7 +120,15 @@ def staff_user(request_body,path):                  #####导购员管理########
                        payload=None
                        )
         else:
-            mysql.insert(insert_sql)
+            m10=mysql.insert(insert_sql)
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, insert_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                        msg='创建成功',
                        payload=None
@@ -115,7 +138,15 @@ def staff_user(request_body,path):                  #####导购员管理########
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
         if resluts!=[]:
-            mysql.update(update_sql)
+            m10=mysql.update(update_sql)
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, update_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                        msg='修改成功',
                        payload=None
@@ -160,7 +191,15 @@ def staff_user(request_body,path):                  #####导购员管理########
         mysql = PymysqlPool()
         resluts = mysql.getAll(select_sql_staff_id)
         if resluts!=[]:
-            mysql.update(delete_sql)
+            m10=mysql.update(delete_sql)
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, delete_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                        msg='操作成功',
                        payload=None
@@ -218,7 +257,15 @@ def catalog(request_body,path):                         #######商品分类管�
         mysql = PymysqlPool()
         if mysql.getAll(select_sql)!=[]:
             update_sql="update Catalog_table set name='{0}' where shop_id='{1}' and id='{2}' ".format(name,id,s_id[0])
-            mysql.update(update_sql)
+            m10=mysql.update(update_sql)
+            if m10 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误".format(path, update_sql)
+                log.LOG.error(msg)
+                return res
             res = dict(code=ResponseCode.SUCCESS,
                msg='修改成功',
                payload=None
@@ -250,7 +297,15 @@ def catalog(request_body,path):                         #######商品分类管�
             else:
                 st2=st2+str(mysql.getAll(select_sql)[i]['id'])+','
         del_sql="delete from Catalog_table where id in ({0}) and shop_id='{1}'".format(st2,id)
-        mysql.delete(del_sql)
+        m10=mysql.delete(del_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误".format(path, del_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='删除成功',
                    payload=None
@@ -267,7 +322,15 @@ def catalog(request_body,path):                         #######商品分类管�
             piarentid=s_id[0]
             insert_sql="insert into Catalog_table(shop_id,name,gradeid,piarentid,status,create_time,update_time) " \
                    "values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(id,name,gradeid,piarentid,'0',date,date)
-        mysql.insert(insert_sql)
+        m10=mysql.insert(insert_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误".format(path, insert_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='创建成功',
                    payload=None

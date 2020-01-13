@@ -1,26 +1,18 @@
-import time
-import dateutil.parser
+#-*-coding:utf-8-*-
+from flask import Flask,sessions,request,make_response,jsonify
+import os
+from db import my_md5,PymysqlPool
+from code1 import ResponseCode,ResponseMessage
 import datetime
-def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT')
-    if param=='Z':
-        if n=='day':
-            d = dateutil.parser.parse(m1)
-            current_time = (d + datetime.timedelta(hours=8)).strftime('%Y-%m-%d')
-        else:
-            d = dateutil.parser.parse(m1)
-            current_time = (d + datetime.timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    elif param=='GMT':
-        if n=='day':
-            dd = m1
-            GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
-            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d')
-        else:
-            dd = m1
-            GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800'
-            current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d %H:%M:%S')
+from user_mode.public import *
+import re
+import json
 
-    return current_time
-
-
-print(date_s_date('2020-01-02T16:00:00.000Z','Z','day'))
-print(date_s_date('Thu Jan 23 2020 08:00:00 GMT+0800','GMT','1'))
+workdir = os.path.split(os.path.realpath(__file__))[0]
+print(workdir)
+f = open(r'C:\Users\huaihaizhi\Desktop\shouyin\areas.json', 'r', encoding='utf-8')
+setting = json.load(f)
+print(setting)
+print(type(setting))
+print(len(setting))
+mysql=PymysqlPool()

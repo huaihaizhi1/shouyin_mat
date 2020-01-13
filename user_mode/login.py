@@ -2,6 +2,7 @@ from flask import make_response,jsonify
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
+import log
 ##########session设置
 
 def login_user1(request_body):
@@ -32,7 +33,7 @@ def login_user1(request_body):
                          payload=None
                          )
     else:
-            res = dict(code=ResponseCode.SUCCESS,
+            res = dict(code=ResponseCode.FAIL,
                        msg='用户不存在',
                        payload=None
                        )
@@ -57,8 +58,17 @@ def create_user1(request_body):
     else:
         insert_sql="insert into user_table(telnumber,passwd,lastday_time,user_name,create_time,update_time) values ('{0}','{1}','{2}','{3}','{4}','{5}')"\
             .format(telnumber,pwd,date,user_name,date,date)
-        mysql.insert(insert_sql)
-        res=dict(code=ResponseCode.SUCCESS,
+        resluts=mysql.insert(insert_sql)
+        if resluts==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format('create_user1',insert_sql)
+            log.LOG.error(msg)
+            return res
+        else:
+            res=dict(code=ResponseCode.SUCCESS,
                      msg='用户注册成功',
                  payload=None
                      )
@@ -77,13 +87,21 @@ def forget_user1(request_body):
     resluts=mysql.getAll(select_sql)
     if resluts!=[]:
         update_sql = "update user_table set passwd='{0}'  where telnumber ='{1}'".format (pwd,telnumber)
-        mysql.update(update_sql)
+        resluts1=mysql.update(update_sql)
+        if resluts1==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format('forget_user1',update_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='密码修改成功',
                    payload='null')
         mysql.dispose()
     else:
-        res = dict(code=ResponseCode.SUCCESS,
+        res = dict(code=ResponseCode.FAIL,
                    msg='用户未注册',
                    payload=None
                    )

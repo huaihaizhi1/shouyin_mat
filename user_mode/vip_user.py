@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 from flask import Flask,sessions,request,make_response,jsonify
-import os
+import log
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
@@ -31,7 +31,15 @@ def vip_user(request_body, path):
                    "'{6}','{7}','{8}')".format(shop_id,vip_id,vip_name,vip_tel_no,sex,vip_grade,birthday,remark,date
                                                                                           )
         print(insert_sql)
-        mysql.insert(insert_sql)
+        resluts1=mysql.insert(insert_sql)
+        if resluts1==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,insert_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='创建成功',
                    payload=None)
@@ -88,7 +96,15 @@ def vip_user(request_body, path):
         update_sql="update vip_table set vip_name='{0}',vip_tel_no='{1}',sex='{2}',vip_grade='{3}',birthday='{4}',remark='{5}'" \
                    " where shop_id='{6}' and vip_id='{7}'".format(vip_name,vip_tel_no,sex,vip_grade,birthday,remark,shop_id,vip_id)
         print(update_sql)
-        mysql.update(update_sql)
+        resluts1=mysql.update(update_sql)
+        if resluts1==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,update_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='修改成功',
                    payload=None)

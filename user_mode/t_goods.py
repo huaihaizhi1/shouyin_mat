@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 from flask import Flask,sessions,request,make_response,jsonify
-import os
+import log
 from db import my_md5,PymysqlPool
 from code1 import ResponseCode,ResponseMessage
 import datetime
@@ -78,16 +78,31 @@ def t_goods(request_body,path):
             goods_id = shop_id+'_'+str(int(res111[0]['goods_id'].split('_')[1])+1)
         print(goods_id)
         date=get_date(0,2)
-        insert_sql="insert into t_goods(goods_id,shop_id,name,inventory_quantity,seling_price,min_num,unit,status,create_time,update_time," \
+        insert_sql="insert into t_goods(goods_id,shop_id,name,inventory_quantity,seling_price,min_num,unit,status,create_time,update_time" \
                    "{0}) values('{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',{11})".format(list2,goods_id,shop_id,name,inventory_quantity,
                                                                                             seling_price,min_num,unit,status,date,date,list3)
         print(insert_sql)
-        mysql.insert(insert_sql)
+        m10=mysql.insert(insert_sql)
+        if m10==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,insert_sql)
+            log.LOG.error(msg)
+            return res
         #####插入流水表完成####
         insert_sql111 = "insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time) values('{1}_{0}','{1}'," \
                         "'{2}','{3}','{4}','{5}','{6}','{7}','{8}')".format(goods_id, shop_id, '', name, unit,
                                                                             user_id, user_name, '进货', date)
-        mysql.insert(insert_sql111)
+        m10=mysql.insert(insert_sql111)
+        if m10==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误,插入流水表".format(path,insert_sql111)
+            log.LOG.error(msg)
         res = dict(code=ResponseCode.SUCCESS,
                    msg='新增成功',
                    payload=None)
@@ -137,12 +152,28 @@ def t_goods(request_body,path):
                         insert1="insert into t_goods_update_table(goods_id,shop_id,code_id,create_time,user_name,Operation_type,name) values(" \
                             "'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(goods_id,shop_id,code_id,date,user_name,Operation_type,name)
                     print(insert1)
-                    mysql.insert(insert1)
+                    m10=mysql.insert(insert1)
+                    if m10 == False:
+                        res = dict(code=ResponseCode.FAIL,
+                                   msg='SQL-error',
+                                   payload=None
+                                   )
+                        msg = "api:{0},error_sql:{1},sql错误".format(path, insert1)
+                        log.LOG.error(msg)
+                        return res
         update_sql="update t_goods set name='{0}',inventory_quantity='{1}',min_num='{2}',seling_price='{3}',type_id='{4}',unit_pinlei='{5}'," \
                    "unit='{6}',threshold_remind='{7}' where goods_id='{8}' ".format(name,inventory_quantity,min_num,seling_price,type_id,unit_pinlei,
                                                                                     unit,threshold_remind,goods_id )
         print(update_sql)
-        mysql.update(update_sql)
+        m10=mysql.update(update_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误".format(path, update_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='修改成功',
                    payload=None)

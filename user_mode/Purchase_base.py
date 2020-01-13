@@ -6,7 +6,7 @@ from code1 import ResponseCode,ResponseMessage
 import datetime
 from user_mode.public import *
 from user_mode.api_param import api_param
-
+import log
 
 
 def purchase_goods(request_body,path):
@@ -45,15 +45,15 @@ def purchase_goods(request_body,path):
                 else:
                     tmp_sql = " and {0}='{1}' ".format(i, request_body.get(i))
                 tmp_sql1=tmp_sql1+tmp_sql
-        print(tmp_sql1)
         select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
         select_sql=select_sql+tmp_sql1
         select_sql=select_sql+limit
         mysql = PymysqlPool()
-        print(select_sql)
+        log.LOG.debug('api:{0},sql:{1}'.format(path,select_sql))
         resluts=mysql.getAll(select_sql)
         total_sql="select count(*) total  from t_purchase_table where shop_id='{0}'".format(shop_id)
         total_sql=total_sql+tmp_sql1
+        log.LOG.debug('api:{0},sql:{1}'.format(path,total_sql))
         res = dict(code=ResponseCode.SUCCESS,
                        msg='查询成功',
                    payload=dict(page=start,
@@ -98,15 +98,38 @@ def purchase_goods(request_body,path):
         insert_sql="insert into t_purchase_table(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,status," \
                    "user_id,user_name,remarks,price_status,create_time) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}')" \
                    "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status,date)
-        print(insert_sql)
-        mysql.insert(insert_sql)
+        resluts1=mysql.insert(insert_sql)
+        if resluts1==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误".format(path,insert_sql)
+            log.LOG.error(msg)
+            return res
         ########货单流水记录##########
         insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
                          "'{4}')".format(shop_id, code_id, date, user_name, '创建')
         insert_tmp1_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
                           "'{4}')".format(shop_id, code_id, date, user_name, '确认')
-        mysql.insert(insert_tmp_sql)
-        mysql.insert(insert_tmp1_sql)
+        m1=mysql.insert(insert_tmp_sql)
+        if m1==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误,货单流水记录".format(path,insert_tmp_sql)
+            log.LOG.error(msg)
+            return res
+        m2=mysql.insert(insert_tmp1_sql)
+        if m2==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误,货单流水记录".format(path,insert_tmp1_sql)
+            log.LOG.error(msg)
+            return res
         ################
         if payload=='' or payload==None or payload==[]:
             mysql.dispose()
@@ -167,11 +190,27 @@ def purchase_goods(request_body,path):
                            "'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{0}_{15}','{16}','{17}')".format(
                     shop_id,code_id,s_code,u_code,s_link,s_photo,name,inventory_quantity,min_num,seling_price,type_id
                     ,unit_pinlei,unit,threshold_remind,status,goods_id,date,date)
-                mysql.insert(insert_sql)
+                m3=mysql.insert(insert_sql)
+                if m3 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,货单商品新增".format(path, insert_sql)
+                    log.LOG.error(msg)
+                    return res
                 ####查看直接查询流水表t_goods_list####
                 insert_sql111="insert into t_goods_list(goods_id,shop_id,code_id,name,unit,user_id,user_name,Operation_type,create_time) values('{1}_{0}','{1}'," \
                               "'{2}','{3}','{4}','{5}','{6}','{7}','{8}')".format(goods_id,shop_id,code_id,name,unit,user_id,user_name,'进货',date)
-                mysql.insert(insert_sql111)
+                m4=mysql.insert(insert_sql111)
+                if m4 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,插入商品流水".format(path, insert_sql111)
+                    log.LOG.error(msg)
+                    return res
             mysql.dispose()
             res = dict(code=ResponseCode.SUCCESS,
                        msg='货单创建成功，成功添加商品',
@@ -266,31 +305,79 @@ def purchase_goods(request_body,path):
         rrr=mysql.getAll(select_sql)
         update_purchase_sql="update t_purchase_table set status='{0}',purchase_price='{1}',price_status='{2}'  where shop_id='{3}' and code_id='{4}'".format(
             status,purchase_price,price_status,shop_id,code_id)
-        mysql.update(update_purchase_sql)
+        m6=mysql.update(update_purchase_sql)
+        if m6==False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg="api:{0},error_sql:{1},sql错误,查询修改参数记录流水".format(path,update_purchase_sql)
+            log.LOG.error(msg)
+            return res
         if str(status)!=str(rrr[0]['status']) and str(rrr[0]['status'])=='0':
             #####货单流水修改####
             insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
                        "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'作废(商品信息删除)',remarks)
-            mysql.insert(insert_sql)
+            m7=mysql.insert(insert_sql)
+            if m7 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误,货单流水修改".format(path, insert_sql)
+                log.LOG.error(msg)
+                return res
             ########作废后商品数据修改#######
             insert_sql1="update t_goods set status=1 where shop_id='{0}' and code_id='{1}'".format(shop_id,code_id)
-            mysql.insert(insert_sql1)
+            m8=mysql.insert(insert_sql1)
+            if m8 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误,作废后商品数据修改".format(path, insert_sql1)
+                log.LOG.error(msg)
+                return res
         if str(purchase_price)!=str(rrr[0]['purchase_price']):
             ########商品金额修改
             mt='金额由{0}修改为{1}'.format(rrr[0]['purchase_price'],purchase_price)
             insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
                        "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,mt,remarks)
-            mysql.insert(insert_sql)
+            m9=mysql.insert(insert_sql)
+            if m9 == False:
+                res = dict(code=ResponseCode.FAIL,
+                           msg='SQL-error',
+                           payload=None
+                           )
+                msg = "api:{0},error_sql:{1},sql错误,商品金额修改".format(path, insert_sql)
+                log.LOG.error(msg)
+                return res
         if str(price_status)!=str(rrr[0]['price_status']):
             ########商品金额修改
             if str(price_status)=='1':
                 insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
                        "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'修改成未付款',remarks)
-                mysql.insert(insert_sql)
+                m10=mysql.insert(insert_sql)
+                if m10 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,商品金额修改".format(path, insert_sql)
+                    log.LOG.error(msg)
+                    return res
             if str(price_status)=='0':
                 insert_sql="insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,remarks) values('{0}','{1}','{2}'," \
                        "'{3}','{4}','{5}')".format(shop_id,code_id,date,user_name,'修改成已付款',remarks)
-                mysql.insert(insert_sql)
+                m10=mysql.insert(insert_sql)
+                if m10 == False:
+                    res = dict(code=ResponseCode.FAIL,
+                               msg='SQL-error',
+                               payload=None
+                               )
+                    msg = "api:{0},error_sql:{1},sql错误,商品金额修改".format(path, insert_sql)
+                    log.LOG.error(msg)
+                    return res
         mysql.dispose()
         res = dict(code=ResponseCode.SUCCESS,
                    msg='货单修改成功',
@@ -354,7 +441,15 @@ def supplier_api(request_body,path):
         update_sql="update t_supplier set name='{0}' , number='{1}' , address='{2}' , contact='{3}'" \
                    " , remarks='{4}'  where shop_id='{5}' and id='{6}'".format(name,number,address,contact,remarks,shop_id,proc_id)
         print(update_sql)
-        mysql.update(update_sql)
+        m10=mysql.update(update_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误,供应商修改".format(path, update_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='修改成功',
                    payload=None
@@ -364,11 +459,15 @@ def supplier_api(request_body,path):
         shop_id=request_body.get('id')
         delete_sql="update t_supplier set status='1' where id='{0}' and shop_id='{1}'".format(proc_id,shop_id)
         print(delete_sql)
-        if mysql.update(delete_sql)==False:
-            res=dict(code=ResponseCode.FAIL,
-                   msg='sqlcuowu',
-                   payload=delete_sql
-                   )
+        m10=mysql.update(delete_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误,".format(path, delete_sql)
+            log.LOG.error(msg)
+            return res
         else:
             res = dict(code=ResponseCode.SUCCESS,
                        msg='删除成功',
@@ -385,7 +484,15 @@ def supplier_api(request_body,path):
         insert_sql="insert into t_supplier(shop_id,name,number,address,contact,remarks,status,create_time) values" \
                    "('{0}','{1}','{2}','{3}','{4}','{5}','0','{6}')".format(shop_id,name,number,address,contact,remarks,date)
         print(insert_sql)
-        mysql.insert(insert_sql)
+        m10=mysql.insert(insert_sql)
+        if m10 == False:
+            res = dict(code=ResponseCode.FAIL,
+                       msg='SQL-error',
+                       payload=None
+                       )
+            msg = "api:{0},error_sql:{1},sql错误,".format(path, delete_sql)
+            log.LOG.error(msg)
+            return res
         res = dict(code=ResponseCode.SUCCESS,
                    msg='新增成功',
                    payload=None
