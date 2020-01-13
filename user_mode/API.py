@@ -32,7 +32,7 @@ server.json_encoder = MyJSONEncoder
 def login_user():                                                       #注意接口名称与上面相同
     dict1=api_param.login_user1                                     #获取接口参数必填项与参数列表(需要修改)
     request_body=request.form                                           #获取接口表单参数
-    res1=Required_verification(request_body,dict1)
+    res1=Required_verification('login_user',request_body,dict1)
     if res1['code']==200:         #必填项检查是否为200
         session['telnumber'] = request_body.get('telnumber')
         res,payload=login_user1(request_body)                                  #必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
@@ -45,25 +45,27 @@ def login_user():                                                       #注意�
 def create_user():
     dict1=api_param.create_user1                                     #获取接口参数必填项与参数列表
     request_body=request.form                                           #获取接口表单参数
-    Required_verification(request_body,dict1)                           #接口必填项验证
+    path=request.path
+    Required_verification(path,request_body,dict1)                           #接口必填项验证
     scode=session.get("code")
     if test_verify_captcha(request_body,scode)['code'] !=200:
         return test_verify_captcha(request_body,scode)
-    if Required_verification(request_body,dict1)['code']==200:         #必填项检查是否为200
+    if Required_verification(path,request_body,dict1)['code']==200:         #必填项检查是否为200
         session['telnumber'] = request_body.get('telnumber')
         res=create_user1(request_body)                                  #必填项为200则进入接口执行阶段并返回结果
     else:
-        res=Required_verification(request_body,dict1)                   #接口返回不为200则提示错误系信息
+        res=Required_verification(path,request_body,dict1)                   #接口返回不为200则提示错误系信息
     return res
 
 @server.route("/forget_user",methods=["POST","GET"])                #忘记密码
 def forget_user():
     dict1=api_param.forget_user1                                     #获取接口参数必填项与参数列表
     request_body=request.form                                           #获取接口表单参数
-    if Required_verification(request_body,dict1)['code']==200:         #必填项检查是否为200
+    path=request.path
+    if Required_verification(path,request_body,dict1)['code']==200:         #必填项检查是否为200
         res=forget_user1(request_body)                                  #必填项为200则进入接口执行阶段并返回结果
     else:
-        res=Required_verification(request_body,dict1)                   #接口返回不为200则提示错误系信息
+        res=Required_verification(path,request_body,dict1)                   #接口返回不为200则提示错误系信息
     return res
 @server.route("/login_out",methods=["POST","GET"])                #退出登录
 def login_out():
@@ -105,7 +107,7 @@ def create_shop():
     dict1 = api_param.create_shop  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = shop(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -119,7 +121,7 @@ def select_shop():
     elif request.method=='GET':
         request_body = request.args
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = shop(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -130,7 +132,7 @@ def update_shop():
     dict1 = api_param.update_shop  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = shop(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -142,7 +144,7 @@ def create_employess():
     dict1 = api_param.create_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = staff_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -153,7 +155,7 @@ def update_employess():
     dict1 = api_param.update_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = staff_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -167,7 +169,7 @@ def select_employess():
     elif request.method=='GET':
         request_body = request.args
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = staff_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -178,7 +180,7 @@ def delete_employess():
     dict1 = api_param.delete_employess  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = staff_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -194,7 +196,7 @@ def select_catalog():
         request_body = request.args
     dict1 = api_param.select_catalog  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = catalog(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -205,7 +207,7 @@ def update_catalog():
     dict1 = api_param.update_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = catalog(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -217,7 +219,7 @@ def del_catalog():
     dict1 = api_param.del_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = catalog(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -229,7 +231,7 @@ def create_catalog():
     dict1 = api_param.create_catalog  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = catalog(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -262,7 +264,7 @@ def select_purchase():
         request_body = request.args
     dict1 = api_param.select_purchase  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -277,7 +279,7 @@ def create_purchase():
         request_body = request.args
     dict1 = api_param.create_purchase  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -293,7 +295,7 @@ def select_purchase_pro1():
         request_body = request.args
     dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -308,7 +310,7 @@ def select_purchase_pro2():
         request_body = request.args
     dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -323,7 +325,7 @@ def select_purchase_pro3():
         request_body = request.args
     dict1 = api_param.select_purchase_pro  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -336,7 +338,7 @@ def update_purchase():
     dict1 = api_param.update_purchase  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = purchase_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -351,7 +353,7 @@ def select_supplier():
         request_body = request.args
     dict1 = api_param.select_supplier  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = supplier_api(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -364,7 +366,7 @@ def update_supplier():
     dict1 = api_param.update_supplier  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = supplier_api(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -377,7 +379,7 @@ def delete_supplier():
     dict1 = api_param.delete_supplier  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = supplier_api(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -389,7 +391,7 @@ def insert_supplier():
     dict1 = api_param.insert_supplier  # 获取接口参数必填项与参数列表(需要修改)
     request_body = request.form  # 获取接口表单参数
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = supplier_api(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -404,7 +406,7 @@ def select_goods():
         request_body = request.args
     dict1 = api_param.select_goods  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -419,7 +421,7 @@ def insert_goods():
         request_body = request.args
     dict1 = api_param.insert_goods  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -434,7 +436,7 @@ def update_goods():
         request_body = request.args
     dict1 = api_param.update_goods  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_goods(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -450,7 +452,7 @@ def insert_vipuser():
         request_body = request.args
     dict1 = api_param.insert_vipuser  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = vip_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -465,7 +467,7 @@ def select_vipuser():
         request_body = request.args
     dict1 = api_param.select_vipuser  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = vip_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -481,7 +483,7 @@ def update_vipuser():
         request_body = request.args
     dict1 = api_param.update_vipuser  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = vip_user(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -497,7 +499,7 @@ def insert_order():
         request_body = request.args
     dict1 = api_param.insert_order  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -512,7 +514,7 @@ def del_order():
         request_body = request.args
     dict1 = api_param.del_order  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -527,7 +529,7 @@ def select_order():
         request_body = request.args
     dict1 = api_param.select_order  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = t_order(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -544,7 +546,7 @@ def bi_Business_analysis():
     dict1 = api_param.bi_Business_analysis  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
     print(request_body)
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -560,7 +562,7 @@ def bi_Business_sum():
     dict1 = api_param.bi_Business_sum  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
     print(request_body)
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -575,7 +577,7 @@ def bi_Business_goods():
         request_body = request.args
     dict1 = api_param.bi_Business_goods  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -591,7 +593,7 @@ def bi_Business_goods_list():
         request_body = request.args
     dict1 = api_param.bi_Business_goods_list  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -606,7 +608,7 @@ def bi_Business_goods_1():
         request_body = request.args
     dict1 = api_param.bi_Business_goods_1  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -621,7 +623,7 @@ def bi_goods_update_list1():
         request_body = request.args
     dict1 = api_param.bi_goods_update_list1  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -636,7 +638,7 @@ def bi_goods_update_list2():
         request_body = request.args
     dict1 = api_param.bi_goods_update_list2  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:
@@ -651,7 +653,7 @@ def bi_staff_select():
         request_body = request.args
     dict1 = api_param.bi_staff_select  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    res1 = Required_verification(request_body, dict1)
+    res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
     else:

@@ -2,16 +2,17 @@ from code1 import *
 from datetime import timedelta
 import datetime
 import dateutil.parser
+import log
 
 ##############################必填项检查#########################
-def Required_verification(request_body,dict1):       ###必填项检查
+def Required_verification(path,request_body,dict1):       ###必填项检查
     if request_body:                                    #判断接口是否有参数
         canshu=dict1                                    #获取接口参数列表
         aa=canshu['mast_info'].split(',')             #逗号分隔必填项列表
         m=0                                             #用于判断必填项是否都填了
         str=''                                          #用于错误信息提示
-        print('接口参数：{0}'.format(request_body))
-        print('必填项参数：{0}'.format(aa))
+        log.LOG.debug('api:{1},接口参数：{0}'.format((request_body),path))
+        log.LOG.debug('api:{1},必填项参数：{0}'.format((aa),path))
         for i in range(0,len(aa)):                      #循环判断必填项检查
             if aa[i] in request_body:
                 if request_body.get(aa[i])!=None: #or request_body.get(aa[i])!='':                 #检查必填字段
