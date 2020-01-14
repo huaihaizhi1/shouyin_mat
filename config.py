@@ -3,8 +3,8 @@ from flask import Flask,sessions,request,make_response,jsonify
 
 ####db_config#######
 dbhost='114.67.90.231'
-db_username='mtuser'
-db_passwd='mtuser'
+db_username='webcat'
+db_passwd='webcat'
 db_port=3306
 db_sid='MTDB'
 

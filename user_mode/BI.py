@@ -1,9 +1,6 @@
 #-*-coding:utf-8-*-
 from flask import Flask,sessions,request,make_response,jsonify
-import os
 from db import my_md5,PymysqlPool
-from code1 import ResponseCode,ResponseMessage
-import datetime
 from user_mode.public import *
 
 

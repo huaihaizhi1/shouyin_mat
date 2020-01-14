@@ -3,7 +3,7 @@ import pymysql
 from pymysql.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
 from config import *
-
+import log
 # 父类连接池，用于初始化数据库连接
 class BasePymysqlPool(object):
     def __init__(self):
@@ -119,13 +119,14 @@ class PymysqlPool(BasePymysqlPool):
     def __query(self, sql, param=None):
         try:
             if param is None:
+                log.LOG.debug('sql:{0}'.format(sql))
                 count = self._cursor.execute(sql)
             else:
                 count = self._cursor.execute(sql, param)
         except :
             self._conn.rollback()
             self._cursor.close()
-            print(sql)
+            log.LOG.debug('sql:{0}'.format(sql))
         return count
 
     def update(self, sql, param=None):

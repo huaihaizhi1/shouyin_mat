@@ -44,7 +44,7 @@ def t_goods(request_body,path):
         select_sql3="select count(*)  as total from t_goods where shop_id='{0}' and status='{1}' " \
                    "".format(shop_id,status)
         select_sql2=select_sql3+tmp_sql1
-        print(select_sql1)
+        log.LOG.debug('api:{0},sql:{1}'.format(path,select_sql2))
         resluts=mysql.getAll(select_sql1)
         total_sql=mysql.getAll(select_sql2)[0]['total']
         res = dict(code=ResponseCode.SUCCESS,

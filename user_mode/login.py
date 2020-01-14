@@ -12,6 +12,7 @@ def login_user1(request_body):
     payload={}
     select_sql='select telnumber,passwd,id,user_name from user_table where telnumber="%s"'%telnumber
     mysql=PymysqlPool()
+    log.LOG.debug('api:{0},sql:{1}'.format('login_user1', select_sql))
     resluts=mysql.getAll(select_sql)
     if resluts!=[]:
         #print(list(my_db(select_sql))[0][0])
@@ -49,6 +50,7 @@ def create_user1(request_body):
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     select_sql = 'select telnumber from user_table where telnumber="%s" '%telnumber
     mysql=PymysqlPool()
+    log.LOG.debug('api:{0},sql:{1}'.format('create_user1', select_sql))
     resluts=mysql.getAll(select_sql)
     if resluts!=[]:
         res=dict(code=ResponseCode.FAIL,
@@ -58,6 +60,7 @@ def create_user1(request_body):
     else:
         insert_sql="insert into user_table(telnumber,passwd,lastday_time,user_name,create_time,update_time) values ('{0}','{1}','{2}','{3}','{4}','{5}')"\
             .format(telnumber,pwd,date,user_name,date,date)
+        log.LOG.debug('api:{0},sql:{1}'.format(create_user1,insert_sql))
         resluts=mysql.insert(insert_sql)
         if resluts==False:
             res = dict(code=ResponseCode.FAIL,

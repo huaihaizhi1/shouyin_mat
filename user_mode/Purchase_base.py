@@ -497,6 +497,9 @@ def supplier_api(request_body,path):
                    msg='新增成功',
                    payload=None
                    )
+    if path=='/t_supplier_put':
+        shop_id=request_body.get('id')
+
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'

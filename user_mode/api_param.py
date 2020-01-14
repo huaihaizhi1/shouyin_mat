@@ -97,6 +97,8 @@ class api_param(object):
     bi_goods_update_list2={'mast_info':'id,start_date,end_date'}
     ######导购员业绩查询########
     bi_staff_select={'mast_info':'id,start_date,end_date'}
+    ######导购员业绩查询########
+    t_supplier_put={'mast_info':'id,start_date,end_date'}
 
 
 class MyJSONEncoder(flask.json.JSONEncoder):
