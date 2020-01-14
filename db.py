@@ -57,8 +57,10 @@ class PymysqlPool(BasePymysqlPool):
         @return: result list(字典对象)/boolean 查询到的结果集
         """
         if param is None:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql)
         else:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql, param)
         if count > 0:
             result = self._cursor.fetchall()
@@ -74,8 +76,10 @@ class PymysqlPool(BasePymysqlPool):
         @return: result list/boolean 查询到的结果集
         """
         if param is None:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql)
         else:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql, param)
         if count > 0:
             result = self._cursor.fetchone()
@@ -92,8 +96,10 @@ class PymysqlPool(BasePymysqlPool):
         @return: result list/boolean 查询到的结果集
         """
         if param is None:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql)
         else:
+            log.LOG.debug('sql:{0}'.format(sql))
             count = self._cursor.execute(sql, param)
         if count > 0:
             result = self._cursor.fetchmany(num)
@@ -109,10 +115,12 @@ class PymysqlPool(BasePymysqlPool):
         @return: count 受影响的行数
         """
         try:
+            log.LOG.debug('sql:{0},values:{1}'.format(sql,values))
             count = self._cursor.executemany(sql, values)
         except :
             self._conn.rollback()
             self._cursor.close()
+            log.LOG.debug('sql:{0},values:{1}'.format(sql,values))
             count=False
         return count
 
