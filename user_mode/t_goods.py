@@ -34,7 +34,7 @@ def t_goods(request_body,path):
                 if request_body.get(i)=='' or request_body.get(i)==None:
                     continue
                 elif i=='name':
-                    tmp_sql=" and (name like '%{0}%' or code_id like '%{0}%' or s_code like '%{0}% or goods_id like '%{0}%') ".format(request_body.get(i))
+                    tmp_sql=" and (name like '%{0}%' or code_id like '%{0}%' or s_code like '%{0}%' or goods_id like '%{0}%') ".format(request_body.get(i))
                 elif i=='start_seling_price':
                     tmp_sql=" and seling_price >='{0}'".format(date_s_date(request_body.get(i),'GMT','day'))
                 elif i=='end_seling_price':

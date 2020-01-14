@@ -173,3 +173,12 @@ def date_s_date(m1,param,n):        ###前端修改时间#######param('Z','GMT',
             current_time=datetime.datetime.strptime(dd, GMT_FORMAT).strftime('%Y-%m-%d %H:%M:%S')
 
     return current_time
+
+def page_check(page,pageSize):
+    if page == '' or page == None:
+        page = '1'
+    if pageSize == '' or pageSize == None:
+        pageSize = '999999999999'
+    start = int(int(page) - 1) * int(pageSize)
+    stop = pageSize
+    return start,stop

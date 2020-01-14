@@ -120,7 +120,7 @@ class PymysqlPool(BasePymysqlPool):
         except :
             self._conn.rollback()
             self._cursor.close()
-            log.LOG.debug('sql:{0},values:{1}'.format(sql,values))
+            log.LOG.error('sql:{0},values:{1}'.format(sql,values))
             count=False
         return count
 
@@ -134,7 +134,7 @@ class PymysqlPool(BasePymysqlPool):
         except :
             self._conn.rollback()
             self._cursor.close()
-            log.LOG.debug('sql:{0}'.format(sql))
+            log.LOG.error('sql:{0}'.format(sql))
         return count
 
     def update(self, sql, param=None):

@@ -545,7 +545,6 @@ def bi_Business_analysis():
         request_body = request.args
     dict1 = api_param.bi_Business_analysis  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
-    print(request_body)
     res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200
         res = Management(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
@@ -660,13 +659,28 @@ def bi_staff_select():
         res = res1  # 接口返回不为200则提示错误系信息
     return res
 
-@server.route('/t_supplier_put',methods=["POST","GET"])           ####应付账款########
+@server.route('/t_supplier_put',methods=["POST","GET"])           ####应付账款查询########
 def t_supplier_put():
     if request.method=='POST':
         request_body = request.form  # 获取接口表单参数
     elif request.method=='GET':
         request_body = request.args
     dict1 = api_param.t_supplier_put  # 获取接口参数必填项与参数列表(需要修改)
+    path=request.path
+    res1 = Required_verification(path,request_body, dict1)
+    if res1['code'] == 200:  # 必填项检查是否为200
+        res = supplier_api(request_body,path)  # 必填项为200则进入接口执行阶段并返回结果(注意接口地址变化)
+    else:
+        res = res1  # 接口返回不为200则提示错误系信息
+    return res
+
+@server.route('/t_supplier_get',methods=["POST","GET"])           ####部分付款########
+def t_supplier_get():
+    if request.method=='POST':
+        request_body = request.form  # 获取接口表单参数
+    elif request.method=='GET':
+        request_body = request.args
+    dict1 = api_param.t_supplier_get  # 获取接口参数必填项与参数列表(需要修改)
     path=request.path
     res1 = Required_verification(path,request_body, dict1)
     if res1['code'] == 200:  # 必填项检查是否为200

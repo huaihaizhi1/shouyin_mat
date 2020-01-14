@@ -45,7 +45,7 @@ def purchase_goods(request_body,path):
                 else:
                     tmp_sql = " and {0}='{1}' ".format(i, request_body.get(i))
                 tmp_sql1=tmp_sql1+tmp_sql
-        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,status,user_name from t_purchase_table where shop_id='{0}'".format(shop_id)
+        select_sql="select id as proc_id,code_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,status,user_name,unpay_price from t_purchase_table where shop_id='{0}'".format(shop_id)
         select_sql=select_sql+tmp_sql1
         select_sql=select_sql+limit
         mysql = PymysqlPool()
@@ -95,9 +95,14 @@ def purchase_goods(request_body,path):
             suppiler_no = '-1'
         remarks=request_body.get('remarks')
         date=get_date(0,2)
+        if price_status=='0':
+            unpay_price='0'
+        else:
+            unpay_price=purchase_price
         insert_sql="insert into t_purchase_table(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,status," \
-                   "user_id,user_name,remarks,price_status,create_time) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}')" \
-                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status,date)
+                   "user_id,user_name,remarks,price_status,create_time,update_time,unpay_price)" \
+                   " values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')" \
+                   "".format(shop_id,code_id,purchase_no,purchase_date,suppiler_no,suppiler_name,purchase_price,'0',user_id,user_name,remarks,price_status,date,date,unpay_price)
         resluts1=mysql.insert(insert_sql)
         if resluts1==False:
             res = dict(code=ResponseCode.FAIL,
@@ -108,10 +113,10 @@ def purchase_goods(request_body,path):
             log.LOG.error(msg)
             return res
         ########货单流水记录##########
-        insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
-                         "'{4}')".format(shop_id, code_id, date, user_name, '创建')
-        insert_tmp1_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type) values('{0}','{1}','{2}','{3}'," \
-                          "'{4}')".format(shop_id, code_id, date, user_name, '确认')
+        insert_tmp_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,user_id) values('{0}','{1}','{2}','{3}'," \
+                         "'{4}','{5}')".format(shop_id, code_id, date, user_name, '创建',user_id)
+        insert_tmp1_sql = "insert into t_purchase_flow(shop_id,code_id,create_time,user_name,Operation_type,user_id) values('{0}','{1}','{2}','{3}'," \
+                          "'{4}','{5}')".format(shop_id, code_id, date, user_name, '确认',user_id)
         m1=mysql.insert(insert_tmp_sql)
         if m1==False:
             res = dict(code=ResponseCode.FAIL,
@@ -225,7 +230,7 @@ def purchase_goods(request_body,path):
         #stop=pageSize
         #limit=" order by id desc limit {0}, {1}".format(start,stop)
         mysql=PymysqlPool()
-        select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,remarks from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
+        select_sql_1="select code_id,shop_id,purchase_no,purchase_date,suppiler_name,purchase_price,price_status,remarks,unpay_price from t_purchase_table where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_2="select id,name,inventory_quantity,seling_price,type_id,unit_pinlei,unit from t_goods where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         select_sql_3="select id,user_name,create_time,Operation_type,remarks from  t_purchase_flow where code_id='{0}' and shop_id='{1}'".format(code_id,shop_id)
         m1=mysql.getAll(select_sql_1)
@@ -499,7 +504,53 @@ def supplier_api(request_body,path):
                    )
     if path=='/t_supplier_put':
         shop_id=request_body.get('id')
+        name=request_body.get('id','')
+        page = request_body.get('page',None)
+        pageSize = request_body.get('pageSize',None)
+        start,stop=page_check(page,pageSize)
+        select_sql="	select * from (	"\
+            "select suppiler_no,suppiler_name,sum(purchase_price) as no_price "\
+            " from t_purchase_table where status='{0}' and price_status='1' and shop_id='{1}' and name like '%{4}%'"\
+            "group by suppiler_no,suppiler_name) t limit {2},{3}".format(shop_id,page,pageSize,name)
+        resluts=mysql.getAll(select_sql)
+        total_sql="	select count(*) as total from (	"\
+            "select suppiler_no,suppiler_name,sum(purchase_price) as no_price "\
+            " from t_purchase_table where status='{0}' and price_status='1' and shop_id='{1}' and name like '%{4}%'"\
+            "group by suppiler_no,suppiler_name) t limit {2},{3}".format(shop_id,page,pageSize,name)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='查询成功',
+                   payload=dict(page=start,
+                                total=mysql.getAll(total_sql)[0]['total'],
+                                pageSize=stop,
+                                pageData=resluts,
+                                key='proc_id'))
+    if path=='/t_supplier_get':
+        shop_id=request_body.get('id')
+        code_id=request_body.get('code_id')
+        unpay_price=request_body.get('unpay_price')
+        pay_price=request_body.get('pay_price')
+        user_name=request_body.get('user_name')
+        user_id=request_body.get('user_id')
+        ###########判断是否完全付款####
 
+        if int(unpay_price)-int(pay_price)<=0:
+            update_status_sql="update t_purchase_table set price_status='0' where shop_id='{0}' and code_id='{1}' ".format(shop_id,code_id)
+            mysql.update(update_status_sql)
+        ##########修改金额#############
+        update_sql = "update t_purchase_table set unpay_price=unpay_price-{0} where shop_id='{1}' and code_id='{2}'".format(
+                pay_price, shop_id, code_id)
+        mysql.update(update_sql)
+        ##########变更信息增加######
+        date=get_date(0,2)
+        Operation_type="本次付款金额：{0}，剩余未付款金额：{1}".format(pay_price,str(int(unpay_price)-int(pay_price)))
+        insert_list_sql="insert into t_purchase_flow(shop_id,code_id,create_time,Operation_type,user_id,user_name)" \
+                        " values('{0}','{1}','{2}','{3}','{4}','{5}')".format(shop_id,code_id,date,Operation_type,user_id,user_name)
+        mysql.insert(insert_list_sql)
+        ########################
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='修改成功',
+                   payload=None
+                   )
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
