@@ -117,12 +117,20 @@ def test_verify_captcha(request_body,scode):
          "payload":{}}
 
 
-def get_date(days,n):
+def get_date(days,n):           #####day:当前日期前多少天
     # 格式化为 年月日 形式 2019-02-25
     if n==1:
         data=(datetime.date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+    elif n=='zeroday':
+        now = (datetime.datetime.now() - datetime.timedelta(days=days))
+        data = now - datetime.timedelta(hours=now.hour, minutes=now.minute, seconds=now.second,
+                                              microseconds=now.microsecond)
+    elif n=='lastday':
+        now = (datetime.datetime.now() - datetime.timedelta(days=days))
+        data = now - datetime.timedelta(hours=now.hour, minutes=now.minute, seconds=now.second,
+                                        microseconds=now.microsecond)
+        data = data  + datetime.timedelta(hours=23, minutes=59, seconds=59)
     else:
-
     # 格式化为 年月日时分秒 形式 2019-02-25 10:56:58.609985
         data=(datetime.datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
     return data

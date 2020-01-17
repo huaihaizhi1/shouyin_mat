@@ -101,6 +101,8 @@ class api_param(object):
     t_supplier_put={'mast_info':'id'}
     ######付款接口########
     t_supplier_get={'mast_info':'id,code_id,unpay_price,user_name,user_id,pay_price'}
+    ######shouye########
+    bi_shouye={'mast_info':'id'}
 
 class MyJSONEncoder(flask.json.JSONEncoder):
 

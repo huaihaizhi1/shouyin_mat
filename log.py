@@ -9,11 +9,11 @@ import os
 
 # 日志文件的路径，FileHandler不能创建目录，这里先检查目录是否存在，不存在创建他
 # 当然也可以继承之后重写FileHandler的构造函数
-month = (datetime.date.today() + datetime.timedelta(days=0)).strftime("%Y%m")
-today = (datetime.date.today() + datetime.timedelta(days=0)).strftime("%Y%m%d")
+# month = (datetime.date.today() + datetime.timedelta(days=0)).strftime("%Y%m")
+# today = (datetime.date.today() + datetime.timedelta(days=0)).strftime("%Y%m%d")
 workdir = os.path.split(os.path.realpath(__file__))[0]
-path = workdir + '/log'
-LOG_FILE_PATH = path + '/{0}/out_{1}.log'.format(month, today)
+path = workdir + '/log/out.log'
+LOG_FILE_PATH = path
 LOG_FILE_PATH = r"C:\Users\huaihaizhi\Desktop\shouyin\log\out.log"
 dir = os.path.dirname(LOG_FILE_PATH)
 if not os.path.isdir(dir):

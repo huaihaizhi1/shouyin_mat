@@ -211,6 +211,44 @@ def Management(request_body,path):
                    payload=dict(
                        pageData=resluts,
                        key='proc_id'))
+    if path=='/bi_shouye':
+        shop_id=request_body.get('id')
+        today_zero_time=get_date(0,'zeroday')
+        yestoday_zero_time=get_date(1,'zeroday')
+        yestoday_last_time=get_date(1,'lastday')
+        endtime=get_date(0,2)
+        selectsql=	"SELECT @rownum := @rownum +1 AS proc_id,e.* from (select t.*,新增会员 from 		"\
+                    "(select date(create_time) date ,	"\
+                    "	sum(case  when status=0 then sal ELSE 0 end) as '销售额',		"\
+                    "	sum(case  when status=0 then sal ELSE 0 end)/	sum(case  when status=0 then 1 ELSE 0 end) as '客单价',		"\
+                    "	sum(case  when status=0 then 1 ELSE 0 end) as '销售笔数',		sum(case  when status=1 then 1 ELSE 0 end) as '退货笔数',		"\
+                    "	sum(case  when status=1 then sal ELSE 0 end) as '退货总额',	"\
+                    "sum(case when status=0  then (case when vip_id='' and vip_id is null then 0 else sal end) else 0 end)	as '会员消费额'		"\
+                    "	from order_master	where shop_id='{0}' 	"\
+                     " and create_time 	BETWEEN '{1}' and '{2}'	group by date(create_time)) t,	"\
+                    "(select date('{1}') as date,count(*)as '新增会员' from vip_table where shop_id='{1}' 	"\
+                    "  and create_time 	BETWEEN '{1}' and '{2}'	) m	"\
+                    "where t.date=m.date	"\
+                    "union ALL	"\
+                    "select t.*,新增会员 from 	"\
+                    "(select date(create_time) date ,	"\
+                    "	sum(case  when status=0 then sal ELSE 0 end) as '销售额',		"\
+                    "	sum(case  when status=0 then sal ELSE 0 end)/	sum(case  when status=0 then 1 ELSE 0 end) as '客单价',		"\
+                    "	sum(case  when status=0 then 1 ELSE 0 end) as '销售笔数',		sum(case  when status=1 then 1 ELSE 0 end) as '退货笔数',		"\
+                    "	sum(case  when status=1 then sal ELSE 0 end) as '退货总额',	"\
+                    "sum(case when status=0  then (case when vip_id='' and vip_id is null then 0 else sal end) else 0 end)	as '会员消费额'		"\
+                    "	from order_master	where shop_id='{0}' 	"\
+                    "  and create_time 	BETWEEN '{3}' and '{4}'	group by date(create_time)) t,	"\
+                    "(select date('{3}') as date,count(*)as '新增会员' from vip_table where shop_id='{0}' 	"\
+                    "  and create_time 	BETWEEN '{3}' and '{4}'	) m	"\
+                    "where t.date=m.date) e	".format(shop_id,today_zero_time,endtime,yestoday_zero_time,yestoday_last_time)
+        print(selectsql)
+        resluts = mysql.getAll(selectsql)
+        res = dict(code=ResponseCode.SUCCESS,
+                   msg='查询成功',
+                   payload=dict(
+                       pageData=resluts,
+                       key='proc_id'))
     mysql.dispose()
     resp = make_response(res)
     resp.headers['Content-Type'] = 'text/json'
